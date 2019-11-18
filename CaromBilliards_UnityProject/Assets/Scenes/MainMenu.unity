@@ -770,6 +770,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_singlePlayerSceneName: SinglePlayer
+  m_masterVolumeSlider: {fileID: 964898236}
 --- !u!4 &1382789768
 Transform:
   m_ObjectHideFlags: 0
