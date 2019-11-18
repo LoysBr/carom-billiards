@@ -22,4 +22,9 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(m_menuSceneName);
     }
+
+    public void OnQuitButtonClick()
+    {
+        Application.Quit();
+    }
 }

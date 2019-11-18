@@ -25,6 +25,11 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene(m_singlePlayerSceneName);
     }
 
+    public void OnQuitButtonClick()
+    {
+        Application.Quit();
+    }
+
     public void OnMasterVolumeSliderChanged(float _newValue)
     {
         GameSettings.Instance.m_masterVolumeValue = _newValue;
