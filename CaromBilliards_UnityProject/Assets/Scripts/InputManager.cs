@@ -33,6 +33,8 @@ public class InputManager : MonoBehaviour
     #region Events
     public delegate void InputShot(float _power);
     public event InputShot InputShotEvent;
+    public delegate void InputShotHolded(float _currentPower);
+    public event InputShotHolded InputShotHoldEvent;
     public delegate void InputCameraRotation(float _angle);
     public event InputCameraRotation InputCameraRotationEvent;
     #endregion
@@ -70,11 +72,15 @@ public class InputManager : MonoBehaviour
                 if(m_shotCurrentPressDuration < m_shotMaxPressDuration)
                 {
                     m_shotCurrentPressDuration += Time.deltaTime;
+                    InputShotHoldEvent(GetShotPower());
                 }
                 else        // Max power !!!!
                 {
                     m_shotCurrentPressDuration = m_shotMaxPressDuration;
-                    InputShotEvent(GetShotPower());
+
+                    InputShotHoldEvent(1);
+                    InputShotEvent(1);
+
                     m_shotCurrentPressDuration = 0.0f;
                 }
             }

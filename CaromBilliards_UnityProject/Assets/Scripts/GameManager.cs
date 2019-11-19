@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerShot(float _power)
     {
-        Debug.Log("OnPlayerShot");
+        //Debug.Log("OnPlayerShot");
     }
 
     public void OnMainMenuButtonClick()
