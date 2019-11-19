@@ -631,6 +631,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_mouseXSpeedFactor: 2.54
+  m_shotMaxPressDuration: 2
 --- !u!1 &407617909
 GameObject:
   m_ObjectHideFlags: 0

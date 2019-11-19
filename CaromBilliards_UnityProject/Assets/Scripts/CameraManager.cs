@@ -3,24 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
-{
-    private static CameraManager m_instance;
-    public static CameraManager Instance
-    {
-        get
-        {
-            return m_instance;
-        }
-    }
-
-    void Awake()
-    {
-        if (m_instance == null)
-        {
-            m_instance = this;
-        }        
-    }
-
+{ 
     //Camera will always look in this direction
     public Transform m_ballToFocusTransform;
 
@@ -48,6 +31,8 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         m_angleOffsetFromBaseDir = 0f;
+
+        InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;
 
         RefreshCameraPosition();
         RefreshCameraOrientation();
