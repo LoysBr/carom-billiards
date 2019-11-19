@@ -4,6 +4,23 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    private static CameraManager m_instance;
+    public static CameraManager Instance
+    {
+        get
+        {
+            return m_instance;
+        }
+    }
+
+    void Awake()
+    {
+        if (m_instance == null)
+        {
+            m_instance = this;
+        }        
+    }
+
     //Camera will always look in this direction
     public Transform m_ballToFocusTransform;
 
@@ -87,5 +104,10 @@ public class CameraManager : MonoBehaviour
         Vector3 newDirPoint = new Vector3(baseDirPoint.x, baseDirPoint.y - verticalDist, baseDirPoint.z);
 
         this.transform.LookAt(newDirPoint, Vector3.up);
+    }
+
+    public void RotateCameraByAngle(float _angle)
+    {
+        m_angleOffsetFromBaseDir += _angle;
     }
 }
