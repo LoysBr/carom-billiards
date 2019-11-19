@@ -7,6 +7,13 @@ public class GameManager : MonoBehaviour
 {
     public string m_menuSceneName;
 
+    public Ball m_whiteBall;
+    public Ball m_redBall;
+    public Ball m_yellowBall;
+
+    public float m_ballsMaxSpeed; //in m/s
+    public float m_ballsFriction; //also in m/s
+
     #region Singleton
     private static GameManager m_instance;
     public static GameManager Instance
@@ -26,9 +33,13 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    public CameraManager m_cameraManager;
+
     [HideInInspector]
     public GameState CurrentGameState { get { return m_currentGameSate; } }
     private GameState m_currentGameSate;
+
+    private Vector3 m_shotAimDirection;
 
     public enum GameState
     {
@@ -41,6 +52,13 @@ public class GameManager : MonoBehaviour
         m_currentGameSate = GameState.WAITING_FOR_SHOT;
 
         InputManager.Instance.InputShotEvent += OnPlayerShot;
+
+        m_cameraManager.OnCameraAimDirectionChanged += OnAimDirectionChanged;
+        m_cameraManager.RefreshCameraPosition();
+        m_cameraManager.RefreshCameraOrientation();
+
+        m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;
+        m_whiteBall.m_friction = m_yellowBall.m_friction = m_redBall.m_friction = m_ballsFriction;
     }
 
 
@@ -52,6 +70,13 @@ public class GameManager : MonoBehaviour
     public void OnPlayerShot(float _power)
     {
         //Debug.Log("OnPlayerShot");
+
+        m_whiteBall.OnBallShot(_power, m_shotAimDirection);
+    }
+
+    public void OnAimDirectionChanged(Vector3 _direction)
+    {
+        m_shotAimDirection = _direction;
     }
 
     public void OnMainMenuButtonClick()

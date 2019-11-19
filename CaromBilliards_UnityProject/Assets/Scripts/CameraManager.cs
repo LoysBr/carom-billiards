@@ -28,23 +28,18 @@ public class CameraManager : MonoBehaviour
     //(I put the table's center). This angle simply move camera around the white ball
     private float m_angleOffsetFromBaseDir;
 
+
+    public delegate void CameraChangedAimDirection(Vector3 _direction);
+    public event CameraChangedAimDirection OnCameraAimDirectionChanged;
+
     void Start()
-    {
+    {      
         m_angleOffsetFromBaseDir = 0f;
 
-        InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;
-
-        RefreshCameraPosition();
-        RefreshCameraOrientation();
+        InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;        
     }
 
-    void Update()
-    {
-        RefreshCameraPosition();
-        RefreshCameraOrientation();
-    }
-
-    private void RefreshCameraPosition()
+    public void RefreshCameraPosition()
     {
         //let's find Camera position in the 2D plan of the table (ball height)
         //I'll use Vector2's 'y' for real 'z'
@@ -77,7 +72,7 @@ public class CameraManager : MonoBehaviour
         this.gameObject.transform.position = newCameraPos;
     }
 
-    private void RefreshCameraOrientation()
+    public void RefreshCameraOrientation()
     {
         //Find the direction of Camera with angle = 0 (horizontal plan)
         Vector3 baseDirPoint = new Vector3(m_ballToFocusTransform.position.x, this.transform.position.y, m_ballToFocusTransform.position.z);
@@ -89,10 +84,15 @@ public class CameraManager : MonoBehaviour
         Vector3 newDirPoint = new Vector3(baseDirPoint.x, baseDirPoint.y - verticalDist, baseDirPoint.z);
 
         this.transform.LookAt(newDirPoint, Vector3.up);
+
+         OnCameraAimDirectionChanged?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
     }
 
     public void RotateCameraByAngle(float _angle)
     {
         m_angleOffsetFromBaseDir += _angle;
+
+        RefreshCameraPosition();
+        RefreshCameraOrientation();
     }
 }
