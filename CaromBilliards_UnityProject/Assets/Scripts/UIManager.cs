@@ -13,9 +13,9 @@ public class UIManager : MonoBehaviour
         m_shotPowerGroup.SetActive(false);
 
         InputManager.Instance.InputShotEvent += OnShot;
-        InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;;
+        InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
+        GameManager.Instance.EndOfShotEvent += OnEndOfShot;
     }
-
     
     void Update()
     {
@@ -33,4 +33,17 @@ public class UIManager : MonoBehaviour
         m_shotPowerGroup.SetActive(false);  
     }
 
+    public void OnEndOfShot(bool _succeed)
+    {
+        if(_succeed)
+        {
+            Debug.Log("Super, poiiiiint");
+        }
+        else
+        {
+            Debug.Log("Fail!");
+        }
+
+        GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
+    }
 }

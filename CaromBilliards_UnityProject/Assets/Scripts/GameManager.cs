@@ -32,6 +32,11 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region Events
+    public delegate void EndOfShot(bool _succeed);
+    public event EndOfShot EndOfShotEvent;
+    #endregion
+
     public CameraManager m_cameraManager;
 
     [HideInInspector]
@@ -43,8 +48,9 @@ public class GameManager : MonoBehaviour
     public enum GameState
     {
         WAITING_FOR_SHOT,
-    }
-      
+        SHOT_IN_PROGRESS,
+        END_OF_SHOT,
+    }      
 
     void Start()
     {
@@ -59,16 +65,42 @@ public class GameManager : MonoBehaviour
         m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;        
     }
 
-    
-
-    void Update()
+    public void Update()
     {
-        
+        //let's check if 3 balls are stoped to know when shot is finished
+        if(m_currentGameSate == GameState.SHOT_IN_PROGRESS)
+        {
+            if(m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
+            {
+                SwitchGameState(GameState.END_OF_SHOT);
+            }
+        }
     }
+
+    public void SwitchGameState(GameState _state)
+    {
+        m_currentGameSate = _state;
+        switch (m_currentGameSate)
+        {
+            case GameState.WAITING_FOR_SHOT:
+                break;
+            case GameState.SHOT_IN_PROGRESS:
+                break;
+            case GameState.END_OF_SHOT:                
+                EndOfShotEvent?.Invoke(m_whiteBall.HasCollidedWithTwoOtherBalls());
+                m_whiteBall.ResetLastShotCollisions();
+                m_yellowBall.ResetLastShotCollisions();
+                m_redBall.ResetLastShotCollisions();
+                break;
+            default:
+                break;
+        }
+    }
+
 
     public void OnPlayerShot(float _power)
     {
-        //Debug.Log("OnPlayerShot");
+        SwitchGameState(GameState.SHOT_IN_PROGRESS);
 
         m_whiteBall.OnBallShot(_power, m_shotAimDirection);
     }
@@ -92,4 +124,5 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
+    
 }

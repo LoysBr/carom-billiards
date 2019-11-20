@@ -72,14 +72,14 @@ public class InputManager : MonoBehaviour
                 if(m_shotCurrentPressDuration < m_shotMaxPressDuration)
                 {
                     m_shotCurrentPressDuration += Time.deltaTime;
-                    InputShotHoldEvent(GetShotPower());
+                    InputShotHoldEvent?.Invoke(GetShotPower());
                 }
                 else        // Max power !!!!
                 {
                     m_shotCurrentPressDuration = m_shotMaxPressDuration;
 
-                    InputShotHoldEvent(1);
-                    InputShotEvent(1);
+                    InputShotHoldEvent?.Invoke(1);
+                    InputShotEvent?.Invoke(1);
 
                     m_shotCurrentPressDuration = 0.0f;
                 }
@@ -91,7 +91,7 @@ public class InputManager : MonoBehaviour
         {
             if(m_lastFrameSpaceKeyPressed)   // when we release the key
             {
-                InputShotEvent(GetShotPower());
+                InputShotEvent?.Invoke(GetShotPower());
             }
 
             m_lastFrameSpaceKeyPressed = false;
@@ -130,5 +130,10 @@ public class InputManager : MonoBehaviour
         {
             m_lastFrameMouseLeftClicked = false;
         }
+    }
+
+    public void OnAimDirectionChanged(Vector3 _direction)
+    {
+        //TODO draw some "targetting helper"
     }
 }
