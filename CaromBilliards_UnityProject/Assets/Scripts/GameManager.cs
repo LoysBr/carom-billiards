@@ -12,7 +12,6 @@ public class GameManager : MonoBehaviour
     public Ball m_yellowBall;
 
     public float m_ballsMaxSpeed; //in m/s
-    public float m_ballsFriction; //also in m/s
 
     #region Singleton
     private static GameManager m_instance;
@@ -57,8 +56,7 @@ public class GameManager : MonoBehaviour
         m_cameraManager.RefreshCameraPosition();
         m_cameraManager.RefreshCameraOrientation();
 
-        m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;
-        m_whiteBall.m_friction = m_yellowBall.m_friction = m_redBall.m_friction = m_ballsFriction;
+        m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;        
     }
 
     

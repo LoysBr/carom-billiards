@@ -9,10 +9,29 @@ public class Ball : MonoBehaviour
 
     private Rigidbody   m_rigidBody;
 
+    public enum BilliardObjects
+    {
+        Cushion,
+        WhiteBall,
+        YellowBall,
+        RedBall
+    }
+
+    //to store every collisions from last shot
+    //for basic rules it's a bit too much but may be 
+    //usefull if we add new rules
+    public List<BilliardObjects> m_lastShotCollisions;
+
     void Start()
     {
         m_rigidBody = GetComponent<Rigidbody>();
+        ResetLastShotCollisions();
     }   
+
+    public void ResetLastShotCollisions()
+    {
+        m_lastShotCollisions = new List<BilliardObjects>(20);
+    }
 
     //collision with other balls
     public void OnCollisionEnter(Collision collision)
