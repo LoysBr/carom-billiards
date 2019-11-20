@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
         m_whiteBall.m_friction = m_yellowBall.m_friction = m_redBall.m_friction = m_ballsFriction;
     }
 
+    
 
     void Update()
     {
@@ -77,6 +78,11 @@ public class GameManager : MonoBehaviour
     public void OnAimDirectionChanged(Vector3 _direction)
     {
         m_shotAimDirection = _direction;
+    }
+
+    public void ResetBallPos()
+    {
+        m_whiteBall.transform.position = new Vector3(-0.599f, 1.43075f, 99.044f);
     }
 
     public void OnMainMenuButtonClick()

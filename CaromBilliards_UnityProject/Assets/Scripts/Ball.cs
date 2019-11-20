@@ -16,6 +16,33 @@ public class Ball : MonoBehaviour
     void Start()
     {
         m_currentSpeed = 0;
+    }   
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        //Vector3 colliderDir = Vector3.Cross(collision.GetContact(0).normal, Vector3.up).normalized;
+        //Debug.Log("colliderDir : " + colliderDir);
+
+        //Vector3 colliderNorm = collision.GetContact(0).normal;
+        //Debug.Log("colliderNorm  : " + colliderNorm);
+       
+
+        //float collisionAngle = Vector3.Angle(colliderDir, m_direction);
+        //Debug.Log("angle : " + collisionAngle);
+
+        //Vector3 newDir = Mathf.Cos(collisionAngle) * colliderDir + Mathf.Sin(collisionAngle) * colliderNorm;
+
+        //Debug.Log("previousDir : " + m_direction);
+        //Debug.Log("newDir : " + newDir);
+
+        //m_direction = newDir;
+    }
+
+    //collision with cushions
+    public void OnTriggerEnter(Collider other)
+    {
+        Vector3 newDir = m_direction - 2 * Vector3.Dot(m_direction, other.transform.forward) * other.transform.forward;
+        m_direction = newDir.normalized;
     }
 
     void Update()
