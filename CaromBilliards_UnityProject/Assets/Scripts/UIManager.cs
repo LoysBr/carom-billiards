@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ public class UIManager : MonoBehaviour
 {
     public Image        m_shotPowerImage;
     public GameObject   m_shotPowerGroup;
+    public Text         m_scoreText;
 
     void Start()
     {
@@ -15,11 +17,13 @@ public class UIManager : MonoBehaviour
         InputManager.Instance.InputShotEvent += OnShot;
         InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
         GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+        ScoreManager.Instance.CurrentGameScoreChangedEvent += OnScoreChanged;
     }
-    
-    void Update()
+
+    private void OnScoreChanged(int _score)
     {
-        
+        //TODO StringBuilder
+        m_scoreText.text = "Score: " + _score.ToString();
     }
 
     public void OnShotPowerChanged(float _power)
@@ -37,11 +41,11 @@ public class UIManager : MonoBehaviour
     {
         if(_succeed)
         {
-            Debug.Log("Super, poiiiiint");
+            //Debug.Log("Super, poiiiiint");
         }
         else
         {
-            Debug.Log("Fail!");
+            //Debug.Log("Fail!");
         }
 
         GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
