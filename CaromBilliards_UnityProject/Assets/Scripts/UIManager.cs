@@ -8,7 +8,11 @@ public class UIManager : MonoBehaviour
 {
     public Image        m_shotPowerImage;
     public GameObject   m_shotPowerGroup;
+
+    public GameObject   m_scorePanel;
     public Text         m_scoreText;
+    public Text         m_elapsedTimeText;
+    public Text         m_shotNumberText;
 
     void Start()
     {
@@ -20,16 +24,27 @@ public class UIManager : MonoBehaviour
             InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
         }
         if (GameManager.Instance)
-            GameManager.Instance.EndOfShotEvent += OnEndOfShot;
-        if (ScoreManager.Instance)
-            ScoreManager.Instance.CurrentGameScoreChangedEvent += OnScoreChanged;
+            GameManager.Instance.EndOfShotEvent += OnEndOfShot;        
     }
 
-    private void OnScoreChanged(int _score)
+    private void Update()
     {
-        //TODO StringBuilder
-        m_scoreText.text = "Score: " + _score.ToString();
-    }
+        if(ScoreManager.Instance)
+        {
+            m_scoreText.text = "Score : " + ScoreManager.Instance.CurrentGameScore;
+            int sec = ((int)ScoreManager.Instance.ElapsedTime) % 60;
+            if(sec >= 10)
+                m_elapsedTimeText.text = ((int) (ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":" + sec.ToString();
+            else
+                m_elapsedTimeText.text = ((int) (ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":0" + sec.ToString();
+
+            m_shotNumberText.text = "Shots : " + ScoreManager.Instance.ShotNumber;
+        }
+        else
+        {
+            m_scorePanel.SetActive(false);
+        }
+    }   
 
     public void OnShotPowerChanged(float _power)
     {

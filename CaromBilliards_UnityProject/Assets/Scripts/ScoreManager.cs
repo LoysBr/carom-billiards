@@ -35,12 +35,13 @@ public class ScoreManager : MonoBehaviour
     }
     #endregion
 
-    private int m_currentGameScore;
-
-    #region Events
-    public delegate void CurrentGameScoreChanged(int _score);
-    public event CurrentGameScoreChanged CurrentGameScoreChangedEvent;
-    #endregion
+    private int     m_currentGameScore;
+    public int      CurrentGameScore { get { return m_currentGameScore; } }
+    private float   m_elapsedTime;
+    public float    ElapsedTime { get { return m_elapsedTime; } }
+    private int     m_shotNumber;
+    public int      ShotNumber { get { return m_shotNumber; } }
+    
 
     public void Start()
     {
@@ -56,9 +57,16 @@ public class ScoreManager : MonoBehaviour
         ResetScores();
     }
 
+    void Update()
+    {
+        m_elapsedTime += Time.deltaTime;    
+    }
+
     public void ResetScores()
     {
         m_currentGameScore = 0;
+        m_elapsedTime = 0f;
+        m_shotNumber = 0;
     }
     
     private void OnEndOfShot(bool _succeed)
@@ -67,12 +75,13 @@ public class ScoreManager : MonoBehaviour
         {
             Debug.Log("Super, poiiiiint");
             m_currentGameScore++;
-            CurrentGameScoreChangedEvent?.Invoke(m_currentGameScore);
         }
         else
         {
             Debug.Log("Fail!");
         }
+
+        m_shotNumber++;
 
         GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
     }

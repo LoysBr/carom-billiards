@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
         if (InputManager.Instance)
             InputManager.Instance.InputShotEvent += OnPlayerShot;
 
-        m_cameraManager.OnCameraAimDirectionChanged += OnAimDirectionChanged;
+        m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
         m_cameraManager.RefreshCameraPosition();
         m_cameraManager.RefreshCameraOrientation();
 
