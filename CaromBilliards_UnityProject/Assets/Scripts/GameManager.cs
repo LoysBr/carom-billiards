@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
     {
         SwitchGameState(GameState.SHOT_IN_PROGRESS);
 
-        m_whiteBall.OnBallShot(_power, m_shotAimDirection);
+        m_whiteBall.OnPlayerShot(_power, m_shotAimDirection);
     }
 
     public void OnAimDirectionChanged(Vector3 _direction)

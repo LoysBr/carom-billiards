@@ -8,6 +8,7 @@ public class Ball : MonoBehaviour
     public float        m_maxSpeed; //in m/s
 
     private Rigidbody   m_rigidBody;
+    private bool        m_isMoving;
 
     public enum BilliardObjects
     {
@@ -67,6 +68,8 @@ public class Ball : MonoBehaviour
             default:
                 break;
         }
+
+        m_isMoving = true;
     }
 
     //collision with cushions
@@ -80,17 +83,21 @@ public class Ball : MonoBehaviour
 
     void Update()
     {
-        
+        if(m_isMoving)
+        {
+            HelpBallStop();
+        }
     }
 
-    public void OnBallShot(float _power, Vector3 _dir)
+    public void OnPlayerShot(float _power, Vector3 _dir)
     {               
         m_rigidBody.velocity = m_maxSpeed * _power * _dir;
+        m_isMoving = true;
     }
 
     public bool IsStopped()
     {
-        return m_rigidBody.velocity == Vector3.zero;
+        return !m_isMoving;
     }
 
     public bool HasCollidedWithTwoOtherBalls()
@@ -107,5 +114,19 @@ public class Ball : MonoBehaviour
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// While using physic, after a shot, balls take a lot
+    /// of time to decrease their velocity down to pure Zero
+    /// We will just fake a bit and force their velocity to 0 when it's near.
+    /// </summary>
+    public void HelpBallStop()
+    {
+        if (m_rigidBody.velocity.magnitude <= 0.005)
+        {
+            m_rigidBody.velocity = Vector3.zero;
+            m_isMoving = false;
+        }
     }
 }

@@ -23,16 +23,15 @@ public class ScoreManager : MonoBehaviour
         if (m_instance == null)     //first opening of menu
         {
             m_instance = this;
+            DontDestroyOnLoad(this);
         }
         else                       //another scene is loaded
         {
             if (m_instance != this) //we only want to keep the original object
-            {
-                Destroy(this.gameObject);
+            {                
+                DestroyImmediate(this.gameObject);
             }
-        }
-
-        DontDestroyOnLoad(this);
+        }        
     }
     #endregion
 
@@ -43,9 +42,15 @@ public class ScoreManager : MonoBehaviour
     public event CurrentGameScoreChanged CurrentGameScoreChangedEvent;
     #endregion
 
-    void Start()
+    public void Start()
     {
-        if(GameManager.Instance) //perhaps we're in another scene, without GameManager
+        if (GameManager.Instance) 
+            GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+    }
+
+    void OnLevelWasLoaded()
+    {
+        if (GameManager.Instance) 
             GameManager.Instance.EndOfShotEvent += OnEndOfShot;
 
         ResetScores();
