@@ -56,10 +56,13 @@ public class InputManager : MonoBehaviour
 
     public void Update()
     {
-        if (GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+        if (GameManager.Instance)
         {
-            ManageMouseInputs();
-            ManageSpacePressure();
+            if (GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+            {
+                ManageMouseInputs();
+                ManageSpacePressure();
+            }
         }
     }
 

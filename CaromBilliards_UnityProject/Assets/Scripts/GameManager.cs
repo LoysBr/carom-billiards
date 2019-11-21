@@ -56,7 +56,8 @@ public class GameManager : MonoBehaviour
     {
         m_currentGameSate = GameState.WAITING_FOR_SHOT;
 
-        InputManager.Instance.InputShotEvent += OnPlayerShot;
+        if (InputManager.Instance)
+            InputManager.Instance.InputShotEvent += OnPlayerShot;
 
         m_cameraManager.OnCameraAimDirectionChanged += OnAimDirectionChanged;
         m_cameraManager.RefreshCameraPosition();
@@ -102,7 +103,7 @@ public class GameManager : MonoBehaviour
     {
         SwitchGameState(GameState.SHOT_IN_PROGRESS);
 
-        m_whiteBall.OnPlayerShot(_power, m_shotAimDirection);
+        m_whiteBall.OnPlayerShot(_power, m_shotAimDirection.normalized); //it's already normalized but it's a double check 
     }
 
     public void OnAimDirectionChanged(Vector3 _direction)
@@ -113,7 +114,7 @@ public class GameManager : MonoBehaviour
     public void ResetBallPos()
     {
         m_whiteBall.transform.position = new Vector3(-0.599f, 1.43075f, 99.044f);
-    }
+    }      
 
     public void OnMainMenuButtonClick()
     {

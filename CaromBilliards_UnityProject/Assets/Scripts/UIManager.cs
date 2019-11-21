@@ -14,10 +14,15 @@ public class UIManager : MonoBehaviour
     {
         m_shotPowerGroup.SetActive(false);
 
-        InputManager.Instance.InputShotEvent += OnShot;
-        InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
-        GameManager.Instance.EndOfShotEvent += OnEndOfShot;
-        ScoreManager.Instance.CurrentGameScoreChangedEvent += OnScoreChanged;
+        if (InputManager.Instance)
+        {
+            InputManager.Instance.InputShotEvent += OnShot;
+            InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
+        }
+        if (GameManager.Instance)
+            GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+        if (ScoreManager.Instance)
+            ScoreManager.Instance.CurrentGameScoreChangedEvent += OnScoreChanged;
     }
 
     private void OnScoreChanged(int _score)
@@ -48,6 +53,7 @@ public class UIManager : MonoBehaviour
             //Debug.Log("Fail!");
         }
 
-        GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
+        if(GameManager.Instance)
+            GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
     }
 }

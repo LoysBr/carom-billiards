@@ -9,6 +9,12 @@ public class Ball : MonoBehaviour
 
     private Rigidbody   m_rigidBody;
     private bool        m_isMoving;
+    
+    #region Sound
+    public AudioClip    m_cushionCollisionSound;
+    public AudioClip    m_ballCollisionSound;
+    public AudioSource  m_audioSource;
+    #endregion        
 
     public enum BilliardObjects
     {
@@ -23,7 +29,7 @@ public class Ball : MonoBehaviour
     //to store every collisions from last shot
     //for basic rules it's a bit too much but may be 
     //usefull if we add new rules
-    public List<BilliardObjects> m_lastShotCollisions;
+    private List<BilliardObjects> m_lastShotCollisions;
 
     void Start()
     {
@@ -70,6 +76,8 @@ public class Ball : MonoBehaviour
         }
 
         m_isMoving = true;
+
+        PlayBallCollisionSound(m_rigidBody.velocity.magnitude / m_maxSpeed);
     }
 
     //collision with cushions
@@ -79,6 +87,8 @@ public class Ball : MonoBehaviour
         m_rigidBody.velocity = newVelocity;
 
         m_lastShotCollisions.Add(BilliardObjects.Cushion);
+
+        PlayCushionCollisionSound(m_rigidBody.velocity.magnitude / m_maxSpeed);
     }
 
     void Update()
@@ -93,6 +103,8 @@ public class Ball : MonoBehaviour
     {               
         m_rigidBody.velocity = m_maxSpeed * _power * _dir;
         m_isMoving = true;
+
+        PlayBallCollisionSound(_power);
     }
 
     public bool IsStopped()
@@ -128,5 +140,21 @@ public class Ball : MonoBehaviour
             m_rigidBody.velocity = Vector3.zero;
             m_isMoving = false;
         }
+    }
+
+    public void PlayCushionCollisionSound(float _volume)
+    {
+        if(GameSettings.Instance)
+            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameSettings.Instance.m_masterVolumeValue);
+        else
+            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume);
+    }
+
+    public void PlayBallCollisionSound(float _volume)
+    {
+        if (GameSettings.Instance)
+            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameSettings.Instance.m_masterVolumeValue);
+        else
+            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume);
     }
 }

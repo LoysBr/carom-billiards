@@ -36,7 +36,8 @@ public class CameraManager : MonoBehaviour
     {      
         m_angleOffsetFromBaseDir = 0f;
 
-        InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;        
+        if (InputManager.Instance)
+            InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;        
     }
 
     public void RefreshCameraPosition()
