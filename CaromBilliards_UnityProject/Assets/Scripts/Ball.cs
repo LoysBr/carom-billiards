@@ -100,8 +100,11 @@ public class Ball : MonoBehaviour
     }
 
     public void OnPlayerShot(float _power, Vector3 _dir)
-    {               
+    {       
         m_rigidBody.velocity = m_maxSpeed * _power * _dir;
+
+        Debug.Log("ball.OnPlayerShot velocity   " + m_rigidBody.velocity);
+
         m_isMoving = true;
 
         PlayBallCollisionSound(_power);

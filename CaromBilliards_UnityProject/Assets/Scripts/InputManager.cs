@@ -85,10 +85,11 @@ public class InputManager : MonoBehaviour
                     InputShotEvent?.Invoke(1);
 
                     m_shotCurrentPressDuration = 0.0f;
+                    m_lastFrameSpaceKeyPressed = false;
                 }
-            }
-
-            m_lastFrameSpaceKeyPressed = true;
+            }      
+            else
+                m_lastFrameSpaceKeyPressed = true;
         }
         else
         {

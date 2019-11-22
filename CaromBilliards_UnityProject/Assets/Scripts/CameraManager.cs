@@ -24,6 +24,7 @@ public class CameraManager : MonoBehaviour
     //Base direction is alignment between White Ball and 'm_referencePointForOrientation' 
     //(I put the table's center). This angle simply move camera around the white ball
     private float m_angleOffsetFromBaseDir;
+    public float AimAngleFromBase { get { return m_angleOffsetFromBaseDir; } }
 
     //Camera will always look in this direction
     private Transform m_ballToFocus;
@@ -210,6 +211,14 @@ public class CameraManager : MonoBehaviour
     public void RotateCameraByAngle(float _angle)
     {
         m_angleOffsetFromBaseDir += _angle;
+
+        RefreshCameraPosition();
+        RefreshCameraOrientation();
+    }
+
+    public void SetCameraPositionWithAngleFromBase(float _angle)
+    {
+        m_angleOffsetFromBaseDir = _angle;
 
         RefreshCameraPosition();
         RefreshCameraOrientation();

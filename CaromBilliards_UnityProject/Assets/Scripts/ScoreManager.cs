@@ -59,7 +59,8 @@ public class ScoreManager : MonoBehaviour
 
     void Update()
     {
-        m_elapsedTime += Time.deltaTime;    
+        if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)            
+            m_elapsedTime += Time.deltaTime;    
     }
 
     public void ResetScores()

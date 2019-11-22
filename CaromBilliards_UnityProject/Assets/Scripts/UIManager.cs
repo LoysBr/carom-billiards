@@ -26,7 +26,6 @@ public class UIManager : MonoBehaviour
         }
         if (GameManager.Instance)
         {
-            //GameManager.Instance.EndOfShotEvent += OnEndOfShot;
             GameManager.Instance.SwitchStateEvent += OnSwitchGameStateEvent;
         }
 
@@ -78,7 +77,7 @@ public class UIManager : MonoBehaviour
     public void OnReplayButtonClicked()
     {
         if (GameManager.Instance)
-            GameManager.Instance.Replay();
+            GameManager.Instance.ReplayStart();
     }
 
     public void OnSwitchGameStateEvent(GameManager.GameState _state)
@@ -92,6 +91,8 @@ public class UIManager : MonoBehaviour
                 break;
             case GameManager.GameState.END_OF_SHOT:
                 m_replayButton.SetActive(true);
+                break;
+            case GameManager.GameState.REPLAY_IN_PROGRESS:
                 break;
             default:
                 break;
