@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,8 @@ public class GameManager : MonoBehaviour
     public Ball m_yellowBall;
 
     public float m_ballsMaxSpeed; //in m/s
+    public float m_endOfShotWaitDuration;
+    private float m_endOfShotWaitTimer;
 
     #region Singleton
     private static GameManager m_instance;
@@ -35,6 +38,14 @@ public class GameManager : MonoBehaviour
     #region Events
     public delegate void EndOfShot(bool _succeed);
     public event EndOfShot EndOfShotEvent;
+
+    public delegate void SwitchState(GameState _newState);
+    public event SwitchState SwitchStateEvent;
+
+    //public delegate void SwitchGameState();
+    //public event SwitchGameState WaitingForShotEvent;
+    //public event SwitchGameState ShotInProgressEvent;
+    //public event SwitchGameState EndOfShotEvent;
     #endregion
 
     public CameraManager m_cameraManager;
@@ -68,17 +79,29 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
-        //let's check if 3 balls are stoped to know when shot is finished
-        if(m_currentGameSate == GameState.SHOT_IN_PROGRESS)
+        switch (m_currentGameSate)
         {
-            if(m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
-            {
-                SwitchGameState(GameState.END_OF_SHOT);
-            }
-        }
+            case GameState.WAITING_FOR_SHOT:
+                break;
+            case GameState.SHOT_IN_PROGRESS:
+                if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
+                {
+                    SwitchGameState(GameState.END_OF_SHOT);
+                }
+                break;
+            case GameState.END_OF_SHOT:
+                m_endOfShotWaitTimer += Time.deltaTime;
+                if(m_endOfShotWaitTimer >= m_endOfShotWaitDuration)
+                {
+                    SwitchGameState(GameState.WAITING_FOR_SHOT);
+                }
+                break;
+            default:
+                break;
+        }     
     }
 
-    public void SwitchGameState(GameState _state)
+    private void SwitchGameState(GameState _state)
     {
         m_currentGameSate = _state;
         switch (m_currentGameSate)
@@ -92,12 +115,14 @@ public class GameManager : MonoBehaviour
                 m_whiteBall.ResetLastShotCollisions();
                 m_yellowBall.ResetLastShotCollisions();
                 m_redBall.ResetLastShotCollisions();
+                m_endOfShotWaitTimer = 0;
                 break;
             default:
                 break;
         }
-    }
 
+        SwitchStateEvent?.Invoke(m_currentGameSate);
+    }       
 
     public void OnPlayerShot(float _power)
     {
@@ -111,19 +136,24 @@ public class GameManager : MonoBehaviour
         m_shotAimDirection = _direction;
     }
 
+    public void Replay()
+    {
+        throw new NotImplementedException();
+    }
+
     public void ResetBallPos()
     {
         m_whiteBall.transform.position = new Vector3(-0.599f, 1.43075f, 99.044f);
     }      
 
-    public void OnMainMenuButtonClick()
+    public void BackToMainMenu()
     {
         SceneManager.LoadScene(m_menuSceneName);
     }
 
-    public void OnQuitButtonClick()
+    public void Quit()
     {
         Application.Quit();
     }
-    
+
 }

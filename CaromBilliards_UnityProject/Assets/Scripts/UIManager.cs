@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
 {
     public Image        m_shotPowerImage;
     public GameObject   m_shotPowerGroup;
+    public GameObject   m_replayButton;
 
     public GameObject   m_scorePanel;
     public Text         m_scoreText;
@@ -24,7 +25,12 @@ public class UIManager : MonoBehaviour
             InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
         }
         if (GameManager.Instance)
-            GameManager.Instance.EndOfShotEvent += OnEndOfShot;        
+        {
+            //GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+            GameManager.Instance.SwitchStateEvent += OnSwitchGameStateEvent;
+        }
+
+        m_replayButton.SetActive(false);
     }
 
     private void Update()
@@ -55,20 +61,40 @@ public class UIManager : MonoBehaviour
     public void OnShot(float _power)
     {
         m_shotPowerGroup.SetActive(false);  
+    }  
+
+    public void OnMainMenuButtonClicked()
+    {
+        if (GameManager.Instance)
+            GameManager.Instance.BackToMainMenu();
     }
 
-    public void OnEndOfShot(bool _succeed)
+    public void OnQuitButtonClicked()
     {
-        if(_succeed)
-        {
-            //Debug.Log("Super, poiiiiint");
-        }
-        else
-        {
-            //Debug.Log("Fail!");
-        }
+        if (GameManager.Instance)
+            GameManager.Instance.Quit();
+    }
 
-        if(GameManager.Instance)
-            GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
+    public void OnReplayButtonClicked()
+    {
+        if (GameManager.Instance)
+            GameManager.Instance.Replay();
+    }
+
+    public void OnSwitchGameStateEvent(GameManager.GameState _state)
+    {
+        switch (_state)
+        {
+            case GameManager.GameState.WAITING_FOR_SHOT:
+                break;
+            case GameManager.GameState.SHOT_IN_PROGRESS:
+                m_replayButton.SetActive(false);
+                break;
+            case GameManager.GameState.END_OF_SHOT:
+                m_replayButton.SetActive(true);
+                break;
+            default:
+                break;
+        }
     }
 }

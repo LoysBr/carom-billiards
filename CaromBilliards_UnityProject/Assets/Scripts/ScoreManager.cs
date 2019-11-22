@@ -82,7 +82,5 @@ public class ScoreManager : MonoBehaviour
         }
 
         m_shotNumber++;
-
-        GameManager.Instance.SwitchGameState(GameManager.GameState.WAITING_FOR_SHOT);
     }
 }
