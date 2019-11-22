@@ -52,12 +52,36 @@ public class CameraManager : MonoBehaviour
         if (GameManager.Instance)
             m_ballToFocus = GameManager.Instance.m_whiteBall.transform;
 
-        m_numberOfAimHelperRays = 3; //TODO : take from GameSettings
-        m_aimHelpers = new List<GameObject>(3);
+        if (GameSettings.Instance)
+        {
+            switch (GameSettings.Instance.m_difficulty)
+            {
+                case GameSettings.Difficulty.Easy:
+                    m_numberOfAimHelperRays = 4;
+                    break;
+                case GameSettings.Difficulty.Medium:
+                    m_numberOfAimHelperRays = 2;
+                    break;
+                case GameSettings.Difficulty.Hard:
+                    m_numberOfAimHelperRays = 0;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+            m_numberOfAimHelperRays = 4;
+
+
+        m_aimHelpers = new List<GameObject>(m_numberOfAimHelperRays);
         for(int i = 0; i < m_numberOfAimHelperRays; i++)
         {
             m_aimHelpers.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
             m_aimHelpers[i].SetActive(false);
+
+            BoxCollider collider = m_aimHelpers[i].GetComponent<BoxCollider>();
+            if (collider)
+                Destroy(collider);
 
             Material material = new Material(Shader.Find("Unlit/Color"));
             material.SetColor("_Color", m_aimHelperColor);
@@ -65,31 +89,54 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    private void SetActiveAimHelpers(bool _b)
+    {
+        for (int i = 0; i < m_numberOfAimHelperRays; i++)
+        {
+            m_aimHelpers[i].SetActive(_b);
+        }
+    }
+
     private void Update()
     {
-        if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+        if (m_numberOfAimHelperRays > 0)
         {
-            ////AIMING HELPER
-            //Vector3 lastPos = m_ballToFocus.position;
-            //Vector3 lastDirection = new Vector3(this.transform.forward.x, 0, this.transform.forward.z).normalized;
-            //RaycastHit hit;            
+            if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+            {
+                if (!m_aimHelpers[0].activeSelf)
+                {
+                    SetActiveAimHelpers(true);
+                }
 
-            //for (int i = 0; i < m_numberOfAimHelperRays; i++)
-            //{
-            //    if (Physics.Raycast(lastPos, lastDirection, out hit, 10))
-            //    {
-            //        //Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
-            //        m_aimHelpers[i].SetActive(true);
-            //        m_aimHelpers[i].transform.localScale = new Vector3(m_aimHelperthickness, m_aimHelperthickness, hit.distance);
-            //        m_aimHelpers[i].transform.localPosition = (hit.point + lastPos) * 0.5f;
-            //        m_aimHelpers[i].transform.localRotation = Quaternion.FromToRotation(Vector3.forward, lastDirection);                  
-                    
-            //        Vector3 newPos = hit.point;
-            //        Vector3 newDir = Vector3.Reflect(lastDirection, hit.normal);
-            //        lastDirection = newDir;
-            //        lastPos = newPos;     
-            //    }                
-            //}            
+                //AIMING HELPER
+                Vector3 lastPos = m_ballToFocus.position;
+                Vector3 lastDirection = new Vector3(this.transform.forward.x, 0, this.transform.forward.z).normalized;
+                RaycastHit hit;
+
+                for (int i = 0; i < m_numberOfAimHelperRays; i++)
+                {
+                    if (Physics.Raycast(lastPos, lastDirection, out hit, 10))
+                    {
+                        Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
+                     
+                        m_aimHelpers[i].transform.localScale = new Vector3(m_aimHelperthickness, m_aimHelperthickness, hit.distance);
+                        m_aimHelpers[i].transform.localPosition = (hit.point + lastPos) * 0.5f;
+                        m_aimHelpers[i].transform.localRotation = Quaternion.FromToRotation(Vector3.forward, lastDirection);
+
+                        Vector3 newPos = hit.point;
+                        Vector3 newDir = Vector3.Reflect(lastDirection, hit.normal);
+                        lastDirection = newDir;
+                        lastPos = newPos;
+                    }
+                }
+            }
+            else
+            {
+                if (m_aimHelpers[0].activeSelf)
+                {
+                    SetActiveAimHelpers(false);
+                }
+            }
         }
     }
 

@@ -17,6 +17,15 @@ public class GameSettings : MonoBehaviour
     [HideInInspector]
     public float m_masterVolumeValue;
 
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard
+    }
+    private Difficulty m_difficulty;
+    public Difficulty GameDifficulty { get { return m_difficulty; } }
+
     void Awake()
     {
         if(m_instance == null)     //first opening of menu
@@ -33,5 +42,6 @@ public class GameSettings : MonoBehaviour
         }        
 
         m_masterVolumeValue = 1.0f;
+        m_difficulty = Difficulty.Easy;
     }          
 }
