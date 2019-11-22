@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Singleton. Only designed to be in a game scene
+/// Has no reference to any other Object
+/// </summary>
 public class InputManager : MonoBehaviour
 {
     #region Tweak
-    [Range(1, 10)]
-    public float m_mouseXSpeedFactor;
-    public float m_shotMaxPressDuration;
+    [Range(1, 6)]
+    [SerializeField]
+    private float m_mouseXSpeedFactor;
+    [SerializeField]
+    private float m_shotMaxPressDuration;
     #endregion
 
     #region Singleton
@@ -25,6 +31,14 @@ public class InputManager : MonoBehaviour
         if (m_instance == null)
         {
             m_instance = this;
+        }
+        else
+        {
+            if (m_instance != this)
+            {
+                Debug.LogError("You cannot have multiple InputManager ! This one will be destroyed.");
+                Destroy(this.gameObject);
+            }
         }
     }
     #endregion
@@ -56,14 +70,8 @@ public class InputManager : MonoBehaviour
 
     public void Update()
     {
-        if (GameManager.Instance)
-        {
-            if (GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
-            {
-                ManageMouseInputs();
-                ManageSpacePressure();
-            }
-        }
+        ManageMouseInputs();
+        ManageSpacePressure();         
     }
 
     public void ManageSpacePressure()
@@ -134,10 +142,5 @@ public class InputManager : MonoBehaviour
         {
             m_lastFrameMouseLeftClicked = false;
         }
-    }
-
-    public void OnAimDirectionChanged(Vector3 _direction)
-    {
-        //TODO draw some "targetting helper"
-    }
+    }       
 }

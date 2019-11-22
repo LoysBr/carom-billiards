@@ -37,6 +37,14 @@ public class GameManager : MonoBehaviour
         {
             m_instance = this;
         }
+        else
+        {
+            if (m_instance != this) 
+            {
+                Debug.LogError("You cannot have multiple GameManager ! This one will be destroyed.");
+                Destroy(this.gameObject);
+            }
+        }
     }
     #endregion
 

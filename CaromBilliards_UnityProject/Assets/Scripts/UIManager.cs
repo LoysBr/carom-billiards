@@ -101,10 +101,13 @@ public class UIManager : MonoBehaviour
 
     public void OnShotPowerChanged(float _power)
     {
-        if(m_shotPowerGroup)
-            m_shotPowerGroup.SetActive(true);
-        if(m_shotPowerImage)
-            m_shotPowerImage.transform.localScale = new Vector3(_power, 1, 1);
+        if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
+        {
+            if (m_shotPowerGroup)
+                m_shotPowerGroup.SetActive(true);
+            if (m_shotPowerImage)
+                m_shotPowerImage.transform.localScale = new Vector3(_power, 1, 1);
+        }
     }
 
     public void OnShot(float _power)

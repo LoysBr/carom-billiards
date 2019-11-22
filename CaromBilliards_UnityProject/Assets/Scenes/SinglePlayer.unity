@@ -416,8 +416,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a959b668a0eb104b9a891da50056553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_mouseXSpeedFactor: 2.71
-  m_shotMaxPressDuration: 1.3
+  m_mouseXSpeedFactor: 2.14
+  m_shotMaxPressDuration: 1
 --- !u!4 &191845588
 Transform:
   m_ObjectHideFlags: 0
