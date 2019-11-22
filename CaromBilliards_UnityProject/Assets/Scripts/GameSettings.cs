@@ -23,9 +23,8 @@ public class GameSettings : MonoBehaviour
         Medium,
         Hard
     }
-    private Difficulty m_difficulty;
-    public Difficulty GameDifficulty { get { return m_difficulty; } }
-
+    public Difficulty m_difficulty;
+    
     void Awake()
     {
         if(m_instance == null)     //first opening of menu
