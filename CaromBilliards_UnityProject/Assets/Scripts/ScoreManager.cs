@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 /// <summary>
 /// Persistent Singleton to share score across every scenes and
@@ -8,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class ScoreManager : MonoBehaviour
 {
-    #region PersistentSingleton
     private static ScoreManager m_instance;
     public static ScoreManager Instance
     {
@@ -16,8 +16,26 @@ public class ScoreManager : MonoBehaviour
         {
             return m_instance;
         }
-    }
+    }        
+
+    private int     m_currentGameScore;
+    public int      CurrentGameScore { get { return m_currentGameScore; } }
+    private float   m_elapsedTime;
+    public float    ElapsedTime { get { return m_elapsedTime; } }
+    private int     m_shotNumber;
+    public int      ShotNumber { get { return m_shotNumber; } }
     
+    public class SerializableScores
+    {
+        public int      m_score;
+        public float    m_elapsedTime;
+        public int      m_shotNumber;
+    }
+
+    private string              m_saveFilePath;
+    private SerializableScores  m_lastGameScore;
+    public SerializableScores   LastGameScore { get { return m_lastGameScore; } }
+
     void Awake()
     {
         if (m_instance == null)     //first opening of menu
@@ -28,33 +46,36 @@ public class ScoreManager : MonoBehaviour
         else                       //another scene is loaded
         {
             if (m_instance != this) //we only want to keep the original object
-            {                
+            {
                 DestroyImmediate(this.gameObject);
             }
-        }        
-    }
-    #endregion
+        }
 
-    private int     m_currentGameScore;
-    public int      CurrentGameScore { get { return m_currentGameScore; } }
-    private float   m_elapsedTime;
-    public float    ElapsedTime { get { return m_elapsedTime; } }
-    private int     m_shotNumber;
-    public int      ShotNumber { get { return m_shotNumber; } }
-    
-
-    public void Start()
-    {
-        if (GameManager.Instance) 
-            GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+        //lazy init here
+        m_saveFilePath = Application.dataPath + "/lastGameSave.json";
+        m_lastGameScore = null;
     }
 
-    void OnLevelWasLoaded()
+    public void Start() //when starting directly in Game scene
     {
-        if (GameManager.Instance) 
+        Init();
+    }
+
+    void OnLevelWasLoaded() //while switching from Menu to Game or Game to Menu scene
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        if (GameManager.Instance)
+        {
             GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+            GameManager.Instance.EndOfGameEvent += SerializeScore;
+        }
 
         ResetScores();
+        DeserializeScore();
     }
 
     void Update()
@@ -74,14 +95,34 @@ public class ScoreManager : MonoBehaviour
     {
         if (_succeed)
         {
-            Debug.Log("Super, poiiiiint");
             m_currentGameScore++;
-        }
-        else
-        {
-            Debug.Log("Fail!");
         }
 
         m_shotNumber++;
+    }
+
+    private void SerializeScore()
+    {
+        SerializableScores s = new SerializableScores();
+        s.m_score = m_currentGameScore;
+        s.m_elapsedTime = m_elapsedTime;
+        s.m_shotNumber = m_shotNumber;
+
+        string jsonScore = JsonUtility.ToJson(s);
+        
+        if(!File.Exists(m_saveFilePath))
+        {
+            File.Create(m_saveFilePath).Dispose();
+        }
+
+        File.WriteAllText(m_saveFilePath, jsonScore);
+    }
+
+    private void DeserializeScore()
+    {
+        if (File.Exists(m_saveFilePath))
+        {
+            m_lastGameScore = JsonUtility.FromJson<SerializableScores>(File.ReadAllText(m_saveFilePath));
+        }
     }
 }

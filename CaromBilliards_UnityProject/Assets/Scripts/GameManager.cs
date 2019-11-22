@@ -41,6 +41,9 @@ public class GameManager : MonoBehaviour
 
     public delegate void SwitchState(GameState _newState);
     public event SwitchState SwitchStateEvent;
+
+    public delegate void EndOfGame();
+    public event EndOfGame EndOfGameEvent;
     #endregion
 
     public CameraManager m_cameraManager;
@@ -156,7 +159,7 @@ public class GameManager : MonoBehaviour
 
     private void SaveLastShotData(float _shotPower)
     {
-        Debug.Log("Save Last Shot Data");
+        //Debug.Log("Save Last Shot Data");
         m_lastShotData = new ReplayShotData();
         m_lastShotData.whiteBallPos = m_whiteBall.gameObject.transform.position;
         m_lastShotData.yellowBallPos = m_yellowBall.gameObject.transform.position;
@@ -168,7 +171,7 @@ public class GameManager : MonoBehaviour
 
     private void PlaceElementsLikeBeforeShot()
     {
-        Debug.Log("PlaceElementsLikeBeforeShot");
+        //Debug.Log("PlaceElementsLikeBeforeShot");
         m_whiteBall.gameObject.transform.position = m_lastShotData.whiteBallPos;
         m_yellowBall.gameObject.transform.position = m_lastShotData.yellowBallPos;
         m_redBall.gameObject.transform.position = m_lastShotData.redBallPos;
@@ -193,6 +196,11 @@ public class GameManager : MonoBehaviour
         m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
     }
 
+    public void FinalizeGame()
+    {
+        EndOfGameEvent?.Invoke();
+    }
+
     public void ResetBallPos()
     {
         //TODO Change this
@@ -201,11 +209,13 @@ public class GameManager : MonoBehaviour
 
     public void BackToMainMenu()
     {
+        FinalizeGame();
         SceneManager.LoadScene(m_menuSceneName);
     }
 
     public void Quit()
     {
+        FinalizeGame();
         Application.Quit();
     }
 
