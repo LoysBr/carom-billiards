@@ -381,6 +381,9 @@ MonoBehaviour:
   m_numberOfAimHelperRays: 3
   m_aimHelperthickness: 0.015
   m_aimHelperColor: {r: 0.3501618, g: 0.7924528, b: 0.31025273, a: 1}
+  m_ballsLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &264297471
 GameObject:
   m_ObjectHideFlags: 0
@@ -1512,6 +1515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_masterVolumeValue: 0
+  m_difficulty: 1
 --- !u!4 &809748055
 Transform:
   m_ObjectHideFlags: 0

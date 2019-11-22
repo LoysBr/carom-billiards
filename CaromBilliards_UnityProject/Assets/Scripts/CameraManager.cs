@@ -33,10 +33,12 @@ public class CameraManager : MonoBehaviour
 
     //In max difficulty there is 0 helper
     //1 Ray is 1 direction until a cushion bounce
-    public int m_numberOfAimHelperRays;
+    public int          m_numberOfAimHelperRays;
 
-    public float m_aimHelperthickness = 0.03f;
-    public Color m_aimHelperColor = Color.blue;
+    public float        m_aimHelperthickness = 0.03f;
+    public Color        m_aimHelperColor = Color.blue;
+
+    public LayerMask    m_ballsLayer;
     #endregion
 
     public delegate void CameraChangedAimDirection(Vector3 _direction);
@@ -102,11 +104,8 @@ public class CameraManager : MonoBehaviour
         if (m_numberOfAimHelperRays > 0)
         {
             if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
-            {
-                if (!m_aimHelpers[0].activeSelf)
-                {
-                    SetActiveAimHelpers(true);
-                }
+            {               
+                SetActiveAimHelpers(true);                
 
                 //AIMING HELPER
                 Vector3 lastPos = m_ballToFocus.position;
@@ -117,11 +116,22 @@ public class CameraManager : MonoBehaviour
                 {
                     if (Physics.Raycast(lastPos, lastDirection, out hit, 10))
                     {
-                        Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
+                        //Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
                      
                         m_aimHelpers[i].transform.localScale = new Vector3(m_aimHelperthickness, m_aimHelperthickness, hit.distance);
                         m_aimHelpers[i].transform.localPosition = (hit.point + lastPos) * 0.5f;
                         m_aimHelpers[i].transform.localRotation = Quaternion.FromToRotation(Vector3.forward, lastDirection);
+
+                        //we don't show any helper after ball collision
+                        //with physics we cannot predict
+                        if (Mathf.Pow(2, hit.collider.gameObject.layer) == m_ballsLayer.value)
+                        {
+                            for (int j = i + 1; j < m_numberOfAimHelperRays; j++)
+                            {
+                                m_aimHelpers[j].SetActive(false);
+                            }
+                            break;
+                        }                            
 
                         Vector3 newPos = hit.point;
                         Vector3 newDir = Vector3.Reflect(lastDirection, hit.normal);

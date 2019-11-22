@@ -41,6 +41,5 @@ public class GameSettings : MonoBehaviour
         }        
 
         m_masterVolumeValue = 1.0f;
-        m_difficulty = Difficulty.Easy;
     }          
 }
