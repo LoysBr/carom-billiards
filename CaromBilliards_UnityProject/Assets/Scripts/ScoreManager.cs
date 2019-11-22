@@ -71,7 +71,7 @@ public class ScoreManager : MonoBehaviour
         if (GameManager.Instance)
         {
             GameManager.Instance.EndOfShotEvent += OnEndOfShot;
-            GameManager.Instance.EndOfGameEvent += SerializeScore;
+            GameManager.Instance.GameOverEvent += SerializeScore;
         }
 
         ResetScores();
@@ -80,7 +80,7 @@ public class ScoreManager : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)            
+        if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)            
             m_elapsedTime += Time.deltaTime;    
     }
 

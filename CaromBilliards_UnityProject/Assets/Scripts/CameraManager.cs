@@ -104,7 +104,7 @@ public class CameraManager : MonoBehaviour
     {
         if (m_numberOfAimHelperRays > 0)
         {
-            if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+            if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
             {               
                 SetActiveAimHelpers(true);                
 

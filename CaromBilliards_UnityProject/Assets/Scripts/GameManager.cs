@@ -11,9 +11,14 @@ public class GameManager : MonoBehaviour
     public Ball     m_whiteBall;
     public Ball     m_redBall;
     public Ball     m_yellowBall;
+    private Vector3 m_whiteBallStartPos;
+    private Vector3 m_yellowBallStartPos;
+    private Vector3 m_redBallStartPos;
 
     public float    m_ballsMaxSpeed; //in m/s
     public float    m_endOfShotWaitDuration;
+    public int      m_gameOverScoreToReach;
+
     private float   m_endOfShotWaitTimer;
 
     #region Singleton
@@ -42,8 +47,8 @@ public class GameManager : MonoBehaviour
     public delegate void SwitchState(GameState _newState);
     public event SwitchState SwitchStateEvent;
 
-    public delegate void EndOfGame();
-    public event EndOfGame EndOfGameEvent;
+    public delegate void GameOver();
+    public event GameOver GameOverEvent;
     #endregion
 
     public CameraManager m_cameraManager;
@@ -55,10 +60,11 @@ public class GameManager : MonoBehaviour
 
     public enum GameState
     {
-        WAITING_FOR_SHOT,
-        SHOT_IN_PROGRESS,
-        END_OF_SHOT,
-        REPLAY_IN_PROGRESS,
+        Shooting,
+        ProcessingShot,
+        EndOfShot,
+        ProcessingReplay,
+        GameOverScreen
     }
     #endregion
 
@@ -79,42 +85,43 @@ public class GameManager : MonoBehaviour
     private Vector3 m_shotAimDirection; //the horizontal/flat ball shot direction
 
     void Start()
-    {
-        m_currentGameSate = GameState.WAITING_FOR_SHOT;
-
+    {      
         if (InputManager.Instance)
             InputManager.Instance.InputShotEvent += OnPlayerShot;
 
         m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
-        m_cameraManager.RefreshCameraPosition();
-        m_cameraManager.RefreshCameraOrientation();
 
         m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;
+        m_whiteBallStartPos = m_whiteBall.transform.position;
+        m_yellowBallStartPos = m_yellowBall.transform.position;
+        m_redBallStartPos = m_redBall.transform.position;
+
+        SwitchGameState(GameState.Shooting);        
     }
 
     public void Update()
     {
         switch (m_currentGameSate)
         {
-            case GameState.WAITING_FOR_SHOT:
+            case GameState.Shooting:
                 break;
-            case GameState.SHOT_IN_PROGRESS:
+            case GameState.ProcessingShot:
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    SwitchGameState(GameState.END_OF_SHOT);
+                    SwitchGameState(GameState.EndOfShot);
                 }
                 break;
-            case GameState.END_OF_SHOT:
+            case GameState.EndOfShot:
                 m_endOfShotWaitTimer += Time.deltaTime;
                 if(m_endOfShotWaitTimer >= m_endOfShotWaitDuration)
                 {
-                    SwitchGameState(GameState.WAITING_FOR_SHOT);
+                    SwitchGameState(GameState.Shooting);
                 }
                 break;
-            case GameState.REPLAY_IN_PROGRESS:
+            case GameState.ProcessingReplay:
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    SwitchGameState(GameState.WAITING_FOR_SHOT);
+                    SwitchGameState(GameState.Shooting);
                 }
                 break;
             default:
@@ -127,30 +134,56 @@ public class GameManager : MonoBehaviour
         m_currentGameSate = _state;
         switch (m_currentGameSate)
         {
-            case GameState.WAITING_FOR_SHOT:
+            case GameState.Shooting:
                 m_cameraManager.SetCameraPositionWithAngleFromBase(0f);
                 break;
-            case GameState.SHOT_IN_PROGRESS:
+            case GameState.ProcessingShot:
                 break;
-            case GameState.END_OF_SHOT:                
+            case GameState.EndOfShot: 
                 EndOfShotEvent?.Invoke(m_whiteBall.HasCollidedWithTwoOtherBalls());
                 m_whiteBall.ResetLastShotCollisions();
                 m_yellowBall.ResetLastShotCollisions();
                 m_redBall.ResetLastShotCollisions();
                 m_endOfShotWaitTimer = 0;
+
+                //checking if Game is over
+                if (ScoreManager.Instance)
+                {
+                    if (ScoreManager.Instance.CurrentGameScore >= m_gameOverScoreToReach)
+                    {
+                        SwitchGameState(GameState.GameOverScreen);
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Without a ScoreManager there will be no GameOver.");
+                }
                 break;
-            case GameState.REPLAY_IN_PROGRESS:
+            case GameState.ProcessingReplay:
+                break;
+            case GameState.GameOverScreen:
+                GameOverEvent?.Invoke();
                 break;
             default:
                 break;
         }
 
         SwitchStateEvent?.Invoke(m_currentGameSate);
-    }       
+    }
+
+    public void RestartGame()
+    {
+        if (ScoreManager.Instance)
+            ScoreManager.Instance.ResetScores();
+
+        ResetBallsPos();
+
+        SwitchGameState(GameState.Shooting);
+    }
 
     public void OnPlayerShot(float _power)
     {
-        SwitchGameState(GameState.SHOT_IN_PROGRESS);
+        SwitchGameState(GameState.ProcessingShot);
 
         m_whiteBall.OnPlayerShot(_power, m_shotAimDirection.normalized); //it's already normalized but it's a double check 
 
@@ -184,11 +217,11 @@ public class GameManager : MonoBehaviour
         m_shotAimDirection = _direction;
     }
 
-    public void ReplayStart()
+    public void StartReplay()
     {
         Debug.Log("start replay");
 
-        SwitchGameState(GameState.REPLAY_IN_PROGRESS);
+        SwitchGameState(GameState.ProcessingReplay);
         PlaceElementsLikeBeforeShot();
 
         //attendre un peu TODO
@@ -196,26 +229,20 @@ public class GameManager : MonoBehaviour
         m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
     }
 
-    public void FinalizeGame()
+    public void ResetBallsPos()
     {
-        EndOfGameEvent?.Invoke();
-    }
-
-    public void ResetBallPos()
-    {
-        //TODO Change this
-        m_whiteBall.transform.position = new Vector3(-0.599f, 1.43075f, 99.044f);
+        m_whiteBall.transform.position = m_whiteBallStartPos;
+        m_yellowBall.transform.position = m_yellowBallStartPos;
+        m_redBall.transform.position = m_redBallStartPos;
     }      
 
     public void BackToMainMenu()
     {
-        FinalizeGame();
         SceneManager.LoadScene(m_menuSceneName);
     }
 
     public void Quit()
     {
-        FinalizeGame();
         Application.Quit();
     }
 

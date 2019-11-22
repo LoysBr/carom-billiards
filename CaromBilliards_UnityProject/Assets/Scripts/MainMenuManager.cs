@@ -27,9 +27,9 @@ public class MainMenuManager : MonoBehaviour
 
                 int sec = ((int)ScoreManager.Instance.LastGameScore.m_elapsedTime) % 60;
                 if (sec >= 10)
-                    m_lastGameTimeText.text = ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":" + sec.ToString();
+                    m_lastGameTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":" + sec.ToString();
                 else
-                    m_lastGameTimeText.text = ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":0" + sec.ToString();
+                    m_lastGameTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":0" + sec.ToString();
             }
             else
             {

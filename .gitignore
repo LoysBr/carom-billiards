@@ -34,3 +34,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+CaromBilliards_UnityProject/Assets/lastGameSave.json

@@ -58,7 +58,7 @@ public class InputManager : MonoBehaviour
     {
         if (GameManager.Instance)
         {
-            if (GameManager.Instance.CurrentGameState == GameManager.GameState.WAITING_FOR_SHOT)
+            if (GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
             {
                 ManageMouseInputs();
                 ManageSpacePressure();
