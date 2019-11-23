@@ -4,8 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Singleton Managing all the game logic
+/// Needs an InputManager
+/// </summary>
 public class GameManager : MonoBehaviour
-{
+{    
+    [SerializeField]
+    private InputManager m_inputManager;
+
     public string m_menuSceneName;
 
     public Ball     m_whiteBall;
@@ -49,6 +56,10 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Events
+    public delegate void PlayerIsShootingEvent(float _power);
+    public event PlayerIsShootingEvent PlayerShotEvent;
+    public event PlayerIsShootingEvent InputShotHoldEvent;
+
     public delegate void EndOfShot(bool _succeed);
     public event EndOfShot EndOfShotEvent;
 
@@ -59,10 +70,14 @@ public class GameManager : MonoBehaviour
     public event GameOver GameOverEvent;
     #endregion
 
+    //Needs a Camera Manager
     public CameraManager m_cameraManager;
 
+    [SerializeField]
+    private PlayerPreferences m_playerPref;
+    public PlayerPreferences PlayerPreferences { get { return m_playerPref; } }
+
     #region GameState
-    [HideInInspector]
     public GameState CurrentGameState { get { return m_currentGameSate; } }
     private GameState m_currentGameSate;   
 
@@ -90,12 +105,11 @@ public class GameManager : MonoBehaviour
     ReplayShotData m_lastShotData;
     #endregion
 
-    private Vector3 m_shotAimDirection; //the horizontal/flat ball shot direction
+    private Vector3 m_shotAimDirection; //the horizontal/flat ball shot direction    
 
     void Start()
-    {      
-        if (InputManager.Instance)
-            InputManager.Instance.InputShotEvent += OnPlayerShot;
+    {        
+        m_inputManager.InputShotHoldEvent += OnInputShotHold;
 
         m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
 
@@ -142,10 +156,12 @@ public class GameManager : MonoBehaviour
         m_currentGameSate = _state;
         switch (m_currentGameSate)
         {
-            case GameState.Shooting:
+            case GameState.Shooting:                
+                m_inputManager.InputShotEvent += OnPlayerShot;
                 m_cameraManager.SetCameraPositionWithAngleFromBase(0f);
                 break;
             case GameState.ProcessingShot:
+                m_inputManager.InputShotEvent -= OnPlayerShot;
                 break;
             case GameState.EndOfShot: 
                 EndOfShotEvent?.Invoke(m_whiteBall.HasCollidedWithTwoOtherBalls());
@@ -191,11 +207,18 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerShot(float _power)
     {
-        SwitchGameState(GameState.ProcessingShot);
+        PlayerShotEvent?.Invoke(_power);
 
         m_whiteBall.OnPlayerShot(_power, m_shotAimDirection.normalized); //it's already normalized but it's a double check 
 
+        SwitchGameState(GameState.ProcessingShot);                
+
         SaveLastShotData(_power);
+    }
+
+    public void OnInputShotHold(float _power)
+    {
+        InputShotHoldEvent?.Invoke(_power);
     }
 
     private void SaveLastShotData(float _shotPower)

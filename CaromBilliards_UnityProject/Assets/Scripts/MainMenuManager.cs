@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
+    private PlayerPreferences m_playerPref;
+
     public string       m_singlePlayerSceneName;
     public Slider       m_masterVolumeSlider;
     public GameObject   m_lastGameScoreParent;
@@ -15,9 +17,16 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
-        m_masterVolumeSlider.value = GameSettings.Instance.m_masterVolumeValue;
+        m_playerPref = FindObjectOfType<PlayerPreferences>();
 
-        if(ScoreManager.Instance)
+        if (m_playerPref)
+            m_masterVolumeSlider.value = m_playerPref.m_masterVolumeValue;
+        else
+            m_masterVolumeSlider.value = 1;
+        //TODO PLAYER PREF
+
+
+        if (ScoreManager.Instance)
         {
             if(ScoreManager.Instance.LastGameScore != null)
             {
@@ -50,6 +59,11 @@ public class MainMenuManager : MonoBehaviour
 
     public void OnMasterVolumeSliderChanged(float _newValue)
     {
-        GameSettings.Instance.m_masterVolumeValue = _newValue;
+        if(m_playerPref)
+            m_playerPref.m_masterVolumeValue = _newValue;
+        else
+        {
+            //TODO PLAYER PREF save
+        }
     }
 }

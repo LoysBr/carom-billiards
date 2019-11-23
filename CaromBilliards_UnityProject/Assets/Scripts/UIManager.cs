@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Needs ref to a GameManager
+/// </summary>
 public class UIManager : MonoBehaviour
 {
     public Image        m_shotPowerImage;
@@ -25,16 +28,13 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         InitGameUI();
-
-        if (InputManager.Instance)
-        {
-            InputManager.Instance.InputShotEvent += OnShot;
-            InputManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
-        }
+              
         if (GameManager.Instance)
         {
             GameManager.Instance.SwitchStateEvent += OnSwitchGameStateEvent;
             GameManager.Instance.GameOverEvent += OnGameOver;
+            GameManager.Instance.PlayerShotEvent += OnShot;
+            GameManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
         }        
     }    
 

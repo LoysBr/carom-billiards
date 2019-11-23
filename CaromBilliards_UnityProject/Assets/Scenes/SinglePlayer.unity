@@ -398,7 +398,7 @@ GameObject:
   - component: {fileID: 191845588}
   - component: {fileID: 191845587}
   m_Layer: 0
-  m_Name: InputManager
+  m_Name: StandardInputManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -538,6 +538,8 @@ MonoBehaviour:
   m_ballsLayer:
     serializedVersion: 2
     m_Bits: 256
+  m_inputManager: {fileID: 0}
+  m_gameSettings: {fileID: 0}
 --- !u!1 &264297471
 GameObject:
   m_ObjectHideFlags: 0
@@ -886,6 +888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52d75a862ef40cc4e911a8f28397e903, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_inputManager: {fileID: 191845587}
   m_menuSceneName: MainMenu
   m_whiteBall: {fileID: 2100364522}
   m_redBall: {fileID: 361072065}
@@ -894,6 +897,7 @@ MonoBehaviour:
   m_endOfShotWaitDuration: 2
   m_gameOverScoreToReach: 1
   m_cameraManager: {fileID: 239317829}
+  m_playerPref: {fileID: 0}
 --- !u!4 &375293573
 Transform:
   m_ObjectHideFlags: 0

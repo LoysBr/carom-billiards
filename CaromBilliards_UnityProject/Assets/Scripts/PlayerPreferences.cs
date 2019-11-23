@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Persistent Singleton to share game settings across every scenes.
+/// Private Singleton other objects optionnaly find via FindObjectOfType
+/// Not necessary to play the game
 /// </summary>
-public class GameSettings : MonoBehaviour
+public class PlayerPreferences : MonoBehaviour
 {
-    private static GameSettings m_instance;
-    public static GameSettings Instance { get
-    {            
-        return m_instance;
-    } }
-
+    private static PlayerPreferences m_instance;
 
     [HideInInspector]
     public float m_masterVolumeValue;

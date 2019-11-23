@@ -42,6 +42,11 @@ public class CameraManager : MonoBehaviour
     public LayerMask    m_ballsLayer;
     #endregion
 
+    [SerializeField]
+    private InputManager m_inputManager;
+    [SerializeField]
+    private PlayerPreferences m_gameSettings;
+
     public delegate void CameraChangedAimDirection(Vector3 _direction);
     public event CameraChangedAimDirection CameraChangedAimDirectionEvent;
 
@@ -49,23 +54,23 @@ public class CameraManager : MonoBehaviour
     {      
         m_angleOffsetFromBaseDir = 0f;
 
-        if (InputManager.Instance)
-            InputManager.Instance.InputCameraRotationEvent += RotateCameraByAngle;
+        m_inputManager = FindObjectOfType<InputManager>();
+        m_inputManager.InputCameraRotationEvent += RotateCameraByAngle;
 
         if (GameManager.Instance)
             m_ballToFocus = GameManager.Instance.m_whiteBall.transform;
 
-        if (GameSettings.Instance)
+        if (m_gameSettings)
         {
-            switch (GameSettings.Instance.m_difficulty)
+            switch (m_gameSettings.m_difficulty)
             {
-                case GameSettings.Difficulty.Easy:
+                case PlayerPreferences.Difficulty.Easy:
                     m_numberOfAimHelperRays = 4;
                     break;
-                case GameSettings.Difficulty.Medium:
+                case PlayerPreferences.Difficulty.Medium:
                     m_numberOfAimHelperRays = 2;
                     break;
-                case GameSettings.Difficulty.Hard:
+                case PlayerPreferences.Difficulty.Hard:
                     m_numberOfAimHelperRays = 0;
                     break;
                 default:

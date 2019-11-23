@@ -135,7 +135,7 @@ public class Ball : MonoBehaviour
     /// </summary>
     public void HelpBallStop()
     {
-        if (m_rigidBody.velocity.magnitude <= 0.005)
+        if (m_rigidBody.velocity.magnitude <= 0.01)
         {
             m_rigidBody.velocity = Vector3.zero;
             m_isMoving = false;
@@ -144,16 +144,16 @@ public class Ball : MonoBehaviour
 
     public void PlayCushionCollisionSound(float _volume)
     {
-        if(GameSettings.Instance)
-            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameSettings.Instance.m_masterVolumeValue);
+        if(GameManager.Instance.PlayerPreferences)
+            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameManager.Instance.PlayerPreferences.m_masterVolumeValue);
         else
             m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume);
     }
 
     public void PlayBallCollisionSound(float _volume)
     {
-        if (GameSettings.Instance)
-            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameSettings.Instance.m_masterVolumeValue);
+        if (GameManager.Instance.PlayerPreferences)
+            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameManager.Instance.PlayerPreferences.m_masterVolumeValue);
         else
             m_audioSource.PlayOneShot(m_ballCollisionSound, _volume);
     }
