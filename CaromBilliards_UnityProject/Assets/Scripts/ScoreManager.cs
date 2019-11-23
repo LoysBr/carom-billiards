@@ -36,7 +36,7 @@ public class ScoreManager : MonoBehaviour
     private SerializableScores  m_lastGameScore;
     public SerializableScores   LastGameScore { get { return m_lastGameScore; } }
 
-    void Awake()
+    private void Awake()
     {
         if (m_instance == null)     //first opening of menu
         {
@@ -56,12 +56,12 @@ public class ScoreManager : MonoBehaviour
         m_lastGameScore = null;
     }
 
-    public void Start() //when starting directly in Game scene
+    private void Start() //when starting directly in Game scene
     {
         Init();
     }
 
-    void OnLevelWasLoaded() //while switching from Menu to Game or Game to Menu scene
+    private void OnLevelWasLoaded() //while switching from Menu to Game or Game to Menu scene
     {
         Init();
     }
@@ -78,7 +78,7 @@ public class ScoreManager : MonoBehaviour
         DeserializeScore();
     }
 
-    void Update()
+    private void Update()
     {
         if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)            
             m_elapsedTime += Time.deltaTime;    

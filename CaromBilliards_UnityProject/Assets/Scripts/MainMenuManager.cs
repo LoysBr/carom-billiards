@@ -17,7 +17,7 @@ public class MainMenuManager : MonoBehaviour
     public Text         m_lastGameTimeText;
     public Text         m_lastGameShotsText;
 
-    void Start()
+    private void Start()
     {
         m_playerPref = FindObjectOfType<PlayerPreferences>();
 

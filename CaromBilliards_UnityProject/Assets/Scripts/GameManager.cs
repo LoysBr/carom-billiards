@@ -13,10 +13,11 @@ public class GameManager : MonoBehaviour
     #region Dependencies
     //Needs an InputManager
     [SerializeField]
-    private InputManager m_inputManager;
+    private InputManager    m_inputManager;
 
     //Needs a Camera Manager
-    public CameraManager m_cameraManager;
+    [SerializeField]
+    private CameraManager   m_cameraManager;
 
     //Optionnal PlayerPreferences
     [SerializeField]
@@ -24,27 +25,29 @@ public class GameManager : MonoBehaviour
     public PlayerPreferences PlayerPreferences { get { return m_playerPref; } } //Used by Ball.cs and CameraManager.cs
     #endregion
 
-    public string m_menuSceneName;
+    
+    public string           m_menuSceneName; //to switch scene
 
-    public Ball     m_whiteBall;
-    public Ball     m_redBall;
-    public Ball     m_yellowBall;
-    private Vector3 m_whiteBallStartPos;
-    private Vector3 m_yellowBallStartPos;
-    private Vector3 m_redBallStartPos;
+    #region Tweak
+    public Ball             m_whiteBall;
+    public Ball             m_redBall;
+    public Ball             m_yellowBall;
+    private Vector3         m_whiteBallStartPos;
+    private Vector3         m_yellowBallStartPos;
+    private Vector3         m_redBallStartPos;
 
     
     [SerializeField]
-    private float   m_shotMaxHoldDuration;
-    public float    ShotMaxHoldDuration { get { return m_shotMaxHoldDuration; } }
+    private float           m_shotMaxHoldDuration;
     [SerializeField]
-    private float   m_ballsMaxSpeed; //in m/s
+    private float           m_ballsMaxSpeed; //in m/s
     [SerializeField]
-    private float   m_endOfShotWaitDuration;
+    private float           m_endOfShotWaitDuration;
     [SerializeField]
-    private int     m_gameOverScoreToReach;
+    private int             m_gameOverScoreToReach;
+    #endregion
 
-    private float   m_endOfShotWaitTimer;
+    private float           m_endOfShotWaitTimer;
 
     #region Singleton
     private static GameManager m_instance;
@@ -113,14 +116,16 @@ public class GameManager : MonoBehaviour
         public float   cameraAngleFromBase; //the m_angleOffsetFromBaseDir, used to calculate camera position 
     }
 
-    ReplayShotData m_lastShotData;
+    private ReplayShotData m_lastShotData;
     #endregion
 
     private Vector3 m_shotAimDirection; //the horizontal/flat ball shot direction    
 
-    void Start()
+    private void Start()
     {        
         m_inputManager.InputShotHoldEvent += OnInputShotHold;
+        m_inputManager.m_shotMaxHoldDuration = m_shotMaxHoldDuration;
+
         m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
 
         //if we didn't manually set a PlayerPref  
@@ -133,7 +138,7 @@ public class GameManager : MonoBehaviour
 
         m_cameraManager.SetGameDifficulty(m_playerPref ? m_playerPref.Difficulty : PlayerPreferences.GameDifficulty.Easy);
 
-        m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;
+        m_whiteBall.MaxSpeed = m_yellowBall.MaxSpeed = m_redBall.MaxSpeed = m_ballsMaxSpeed;
         m_whiteBallStartPos = m_whiteBall.transform.position;
         m_yellowBallStartPos = m_yellowBall.transform.position;
         m_redBallStartPos = m_redBall.transform.position;
@@ -141,7 +146,7 @@ public class GameManager : MonoBehaviour
         SwitchGameState(GameState.Shooting);        
     }
 
-    public void Update()
+    private void Update()
     {
         switch (m_currentGameSate)
         {
@@ -225,7 +230,7 @@ public class GameManager : MonoBehaviour
         SwitchGameState(GameState.Shooting);
     }
 
-    public void OnPlayerShot(float _power)
+    private void OnPlayerShot(float _power)
     {
         PlayerShotEvent?.Invoke(_power);
 
@@ -236,7 +241,7 @@ public class GameManager : MonoBehaviour
         SaveLastShotData(_power);
     }
 
-    public void OnInputShotHold(float _power)
+    private void OnInputShotHold(float _power)
     {
         InputShotHoldEvent?.Invoke(_power);
     }
@@ -261,9 +266,9 @@ public class GameManager : MonoBehaviour
         m_redBall.gameObject.transform.position = m_lastShotData.redBallPos;
 
         m_cameraManager.SetCameraPositionWithAngleFromBase(m_lastShotData.cameraAngleFromBase);
-    }       
+    }
 
-    public void OnAimDirectionChanged(Vector3 _direction)
+    private void OnAimDirectionChanged(Vector3 _direction)
     {
         m_shotAimDirection = _direction;
     }
@@ -280,7 +285,7 @@ public class GameManager : MonoBehaviour
         m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
     }
 
-    public void ResetBallsPos()
+    private void ResetBallsPos()
     {
         m_whiteBall.transform.position = m_whiteBallStartPos;
         m_yellowBall.transform.position = m_yellowBallStartPos;
@@ -296,5 +301,4 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
     }
-
 }

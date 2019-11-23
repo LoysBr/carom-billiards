@@ -34,12 +34,14 @@ public class CameraManager : MonoBehaviour
 
     //In max difficulty there is 0 helper
     //1 Ray is 1 direction until a cushion bounce
-    public int          m_numberOfAimHelperRays;
+    private int         m_numberOfAimHelperRays;
 
-    public float        m_aimHelperthickness = 0.03f;
-    public Color        m_aimHelperColor = Color.blue;
-
-    public LayerMask    m_ballsLayer;
+    [SerializeField]
+    private float       m_aimHelperthickness = 0.03f;
+    [SerializeField]
+    private Color       m_aimHelperColor = Color.blue;
+    [SerializeField]
+    private LayerMask   m_ballsLayer;
     #endregion
 
     [SerializeField]
@@ -55,7 +57,7 @@ public class CameraManager : MonoBehaviour
     public delegate void CameraChangedAimDirection(Vector3 _direction);
     public event CameraChangedAimDirection CameraChangedAimDirectionEvent;
 
-    void Start()
+    private void Start()
     {      
         m_angleOffsetFromBaseDir = 0f;
 
@@ -108,9 +110,9 @@ public class CameraManager : MonoBehaviour
         {
             m_aimHelpers[i].SetActive(_b);
         }
-    }    
+    }
 
-    public void DisableAimHelpers()
+    private void DisableAimHelpers()
     {
         for (int i = 0; i < m_numberOfAimHelperRays; i++)
         {
@@ -118,7 +120,7 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void DeleteAimHelpers()
+    private void DeleteAimHelpers()
     {
         for (int i = 0; i < m_aimHelpers.Count; i++)
         {
@@ -190,7 +192,7 @@ public class CameraManager : MonoBehaviour
         }        
     }
 
-    public void RefreshCameraPosition()
+    private void RefreshCameraPosition()
     {
         //let's find Camera position in the 2D plan of the table (ball height)
         //I'll use Vector2's 'y' for real 'z'
@@ -223,7 +225,7 @@ public class CameraManager : MonoBehaviour
         this.gameObject.transform.position = newCameraPos;
     }
 
-    public void RefreshCameraOrientation()
+    private void RefreshCameraOrientation()
     {
         //Find the direction of Camera with angle = 0 (horizontal plan)
         Vector3 baseDirPoint = new Vector3(m_ballToFocus.position.x, this.transform.position.y, m_ballToFocus.position.z);
@@ -239,7 +241,7 @@ public class CameraManager : MonoBehaviour
          CameraChangedAimDirectionEvent?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
     }
 
-    public void RotateCameraByAngle(float _angle)
+    private void RotateCameraByAngle(float _angle)
     {
         m_angleOffsetFromBaseDir += _angle;
 

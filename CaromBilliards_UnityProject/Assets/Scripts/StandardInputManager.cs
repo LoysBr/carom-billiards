@@ -14,49 +14,41 @@ public class StandardInputManager : InputManager
     [SerializeField]
     private float m_mouseXSpeedFactor;    
     #endregion
-        
-    //public delegate void InputShot(float _power);
-  //  public event InputShot InputShotEvent;
-  ////  public delegate void InputShotHolded(float _currentPower);
-  //  public event InputShotHolded InputShotHoldEvent;
-  // // public delegate void InputCameraRotation(float _angle);
-  //  public event InputCameraRotation InputCameraRotationEvent;
 
-    #region PrivateAttributes
+
     //Mouse
-    private Vector3 m_previousMousePosition;
-    private bool m_lastFrameMouseLeftClicked;
+    private Vector3     m_previousMousePosition;
+    private bool        m_lastFrameMouseLeftClicked;
 
     //Space key
-    private bool m_lastFrameSpaceKeyPressed;
-    private float m_shotCurrentPressDuration = 0.0f;
-    #endregion
+    private bool        m_lastFrameSpaceKeyPressed;
+    private float       m_shotCurrentPressDuration = 0.0f;    
 
-    public void Start()
+    private void Start()
     {
         m_lastFrameSpaceKeyPressed = false;
     }
 
-    public void Update()
+    private void Update()
     {
         ManageMouseInputs();
         ManageSpacePressure();         
     }
 
-    public void ManageSpacePressure()
+    private void ManageSpacePressure()
     {
         if (Input.GetKey(KeyCode.Space))
         {
             if(m_lastFrameSpaceKeyPressed)
             {
-                if(m_shotCurrentPressDuration < GameManager.Instance.ShotMaxHoldDuration)
+                if(m_shotCurrentPressDuration < m_shotMaxHoldDuration)
                 {
                     m_shotCurrentPressDuration += Time.deltaTime;
                     InvokeInputShotHoldEvent(GetShotPower());
                 }
                 else        // Max power !!!!
                 {
-                    m_shotCurrentPressDuration = GameManager.Instance.ShotMaxHoldDuration;
+                    m_shotCurrentPressDuration = m_shotMaxHoldDuration;
 
                     InvokeInputShotHoldEvent(1);
                     InvokeInputShotEvent(1);
@@ -80,12 +72,12 @@ public class StandardInputManager : InputManager
         }
     }
 
-    public float GetShotPower()
+    private float GetShotPower()
     {
-        return m_shotCurrentPressDuration / GameManager.Instance.ShotMaxHoldDuration;
+        return m_shotCurrentPressDuration / m_shotMaxHoldDuration;
     }
 
-    public void ManageMouseInputs()
+    private void ManageMouseInputs()
     {
         if (Input.GetMouseButton(0))
         {

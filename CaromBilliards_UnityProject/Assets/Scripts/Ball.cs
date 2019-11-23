@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    [HideInInspector]
-    public float        m_maxSpeed; //in m/s
+    private float       m_maxSpeed; //in m/s
+    public float MaxSpeed { get { return m_maxSpeed; }
+        set { m_maxSpeed = value; } }
 
     private Rigidbody   m_rigidBody;
     private bool        m_isMoving;
@@ -16,7 +17,7 @@ public class Ball : MonoBehaviour
     public AudioSource  m_audioSource;
     #endregion        
 
-    public enum BilliardObjects
+    private enum BilliardObjects
     {
         Cushion,
         WhiteBall,
@@ -31,7 +32,7 @@ public class Ball : MonoBehaviour
     //usefull if we add new rules
     private List<BilliardObjects> m_lastShotCollisions;
 
-    void Start()
+    private void Start()
     {
         m_rigidBody = GetComponent<Rigidbody>();
         ResetLastShotCollisions();
@@ -58,7 +59,7 @@ public class Ball : MonoBehaviour
     }
 
     //collision with other balls
-    public void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         switch(collision.collider.gameObject.tag)
         {
@@ -81,7 +82,7 @@ public class Ball : MonoBehaviour
     }
 
     //collision with cushions
-    public void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         Vector3 newVelocity = m_rigidBody.velocity - 2 * Vector3.Dot(m_rigidBody.velocity, other.transform.forward) * other.transform.forward;
         m_rigidBody.velocity = newVelocity;
@@ -91,7 +92,7 @@ public class Ball : MonoBehaviour
         PlayCushionCollisionSound(m_rigidBody.velocity.magnitude / m_maxSpeed);
     }
 
-    void Update()
+    private void Update()
     {
         if(m_isMoving)
         {
@@ -133,7 +134,7 @@ public class Ball : MonoBehaviour
     /// of time to decrease their velocity down to pure Zero
     /// We will just fake a bit and force their velocity to 0 when it's near.
     /// </summary>
-    public void HelpBallStop()
+    private void HelpBallStop()
     {
         if (m_rigidBody.velocity.magnitude <= 0.01)
         {
@@ -142,7 +143,7 @@ public class Ball : MonoBehaviour
         }
     }
 
-    public void PlayCushionCollisionSound(float _volume)
+    private void PlayCushionCollisionSound(float _volume)
     {
         if(GameManager.Instance.PlayerPreferences)
             m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameManager.Instance.PlayerPreferences.MasterVolume);
@@ -150,7 +151,7 @@ public class Ball : MonoBehaviour
             m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume);
     }
 
-    public void PlayBallCollisionSound(float _volume)
+    private void PlayBallCollisionSound(float _volume)
     {
         if (GameManager.Instance.PlayerPreferences)
             m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameManager.Instance.PlayerPreferences.MasterVolume);

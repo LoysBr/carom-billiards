@@ -64,7 +64,7 @@ public class PlayerPreferences : MonoBehaviour
         }
     }
 
-    void Awake()
+    private void Awake()
     {
         if(m_instance == null)     //first opening of menu
         {

@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour
     public Text         m_gameOverElapsedTimeText;
     public Text         m_gameOverShotNumberText;
 
-    void Start()
+    private void Start()
     {
         InitGameUI();
               
@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void OnGameOver()
+    private void OnGameOver()
     {
         if (m_gameOverPanel)
         { 
@@ -94,7 +94,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void OnShotPowerChanged(float _power)
+    private void OnShotPowerChanged(float _power)
     {
         if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
         {
@@ -105,7 +105,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void OnShot(float _power)
+    private void OnShot(float _power)
     {
         if(m_shotPowerGroup)
             m_shotPowerGroup.SetActive(false);  
@@ -137,7 +137,7 @@ public class UIManager : MonoBehaviour
         InitGameUI();
     }
 
-    public void OnSwitchGameStateEvent(GameManager.GameState _state)
+    private void OnSwitchGameStateEvent(GameManager.GameState _state)
     {
         switch (_state)
         {
