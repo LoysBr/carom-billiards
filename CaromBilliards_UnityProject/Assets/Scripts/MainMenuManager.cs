@@ -10,6 +10,7 @@ public class MainMenuManager : MonoBehaviour
 
     public string       m_singlePlayerSceneName;
     public Slider       m_masterVolumeSlider;
+    public Dropdown     m_difficultyDropdown;
     public GameObject   m_lastGameScoreParent;
     public Text         m_lastGameScoreText;
     public Text         m_lastGameTimeText;
@@ -20,10 +21,19 @@ public class MainMenuManager : MonoBehaviour
         m_playerPref = FindObjectOfType<PlayerPreferences>();
 
         if (m_playerPref)
+        {
+            m_masterVolumeSlider.gameObject.SetActive(true);
             m_masterVolumeSlider.value = m_playerPref.MasterVolume;
+
+            m_difficultyDropdown.gameObject.SetActive(true);
+            m_difficultyDropdown.AddOptions(new List<string>(m_playerPref.GetDifficultyValuesStrings()));
+            m_difficultyDropdown.value = (int) m_playerPref.Difficulty;
+        }
         else
-            m_masterVolumeSlider.value = 1;
-        //TODO PLAYER PREF
+        {
+            m_masterVolumeSlider.gameObject.SetActive(false);
+            m_difficultyDropdown.gameObject.SetActive(false);
+        }      
 
 
         if (ScoreManager.Instance)
@@ -60,10 +70,12 @@ public class MainMenuManager : MonoBehaviour
     public void OnMasterVolumeSliderChanged(float _newValue)
     {
         if(m_playerPref)
-            m_playerPref.MasterVolume = _newValue;
-        else
-        {
-            //TODO PLAYER PREF save
-        }
+            m_playerPref.MasterVolume = _newValue;        
+    }
+
+    public void OnDifficultyChanged(int _difficulty)
+    {
+        if(m_playerPref)
+            m_playerPref.Difficulty = (PlayerPreferences.GameDifficulty)_difficulty;
     }
 }

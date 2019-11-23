@@ -91,4 +91,8 @@ public class PlayerPreferences : MonoBehaviour
         }
     }        
     
+    public string[] GetDifficultyValuesStrings()
+    {
+        return System.Enum.GetNames(typeof(GameDifficulty));
+    }
 }
