@@ -27,7 +27,8 @@ public class CameraManager : MonoBehaviour
     public float AimAngleFromBase { get { return m_angleOffsetFromBaseDir; } }
 
     //Camera will always look in this direction
-    private Transform m_ballToFocus;
+    [SerializeField]
+    private Transform       m_ballToFocus;
 
     #region AimHelper
     private List<GameObject> m_aimHelpers;
@@ -61,11 +62,7 @@ public class CameraManager : MonoBehaviour
     {      
         m_angleOffsetFromBaseDir = 0f;
 
-        m_inputManager = FindObjectOfType<InputManager>();
-        m_inputManager.InputCameraRotationEvent += RotateCameraByAngle;
-
-        if (GameManager.Instance)
-            m_ballToFocus = GameManager.Instance.m_whiteBall.transform;        
+        m_inputManager.InputCameraRotationEvent += RotateCameraByAngle;           
     }
 
     private void InitAimHelpers()
@@ -134,6 +131,12 @@ public class CameraManager : MonoBehaviour
     //We update Aim Helpers objects depending of camera direction
     private void Update()
     {
+        if (!m_ballToFocus)
+        {
+            Debug.LogError("CameraManager needs a 'ballToFocus'.");
+            return;
+        }
+
         if (m_aimHelpers == null)
         {
             //this case is triggered only if nobody called SetGameDifficulty()
@@ -144,8 +147,15 @@ public class CameraManager : MonoBehaviour
         {
             if (m_numberOfAimHelperRays > 0)
             {
-                if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
+                if (GameManager.Instance && GameManager.Instance.CurrentGameState != GameManager.GameState.Shooting)
                 {
+                    if (m_aimHelpers[0].activeSelf)
+                    {
+                        SetActiveAimHelpers(false);
+                    }
+                }
+                else  //If there is no GameManager (for debug / testing purpose ?) we activate AimHelpers anyway
+                { 
                     SetActiveAimHelpers(true);
 
                     //AIMING HELPER
@@ -179,13 +189,6 @@ public class CameraManager : MonoBehaviour
                             lastDirection = newDir;
                             lastPos = newPos;
                         }
-                    }
-                }
-                else
-                {
-                    if (m_aimHelpers[0].activeSelf)
-                    {
-                        SetActiveAimHelpers(false);
                     }
                 }
             }

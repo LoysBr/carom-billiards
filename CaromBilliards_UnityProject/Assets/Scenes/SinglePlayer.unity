@@ -416,6 +416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a959b668a0eb104b9a891da50056553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_shotMaxHoldDuration: 0
   m_mouseXSpeedFactor: 2.14
 --- !u!4 &191845588
 Transform:
@@ -513,7 +514,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 56.1, y: 0, z: 0}
 --- !u!114 &239317829
 MonoBehaviour:
@@ -531,13 +532,13 @@ MonoBehaviour:
   m_horizontalDistanceToBall: 1.5
   m_cameraHeight: 1.5
   m_cameraPitchAngle: 40
-  m_numberOfAimHelperRays: 3
+  m_ballToFocus: {fileID: 2100364521}
   m_aimHelperthickness: 0.015
   m_aimHelperColor: {r: 0.3501618, g: 0.7924528, b: 0.31025273, a: 1}
   m_ballsLayer:
     serializedVersion: 2
     m_Bits: 256
-  m_inputManager: {fileID: 0}
+  m_inputManager: {fileID: 191845587}
 --- !u!1 &264297471
 GameObject:
   m_ObjectHideFlags: 0
@@ -2073,7 +2074,7 @@ RectTransform:
   - {fileID: 1992112982}
   - {fileID: 677329497}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
