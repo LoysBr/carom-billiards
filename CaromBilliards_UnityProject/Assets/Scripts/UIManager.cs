@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CaromBilliards;
 
 /// <summary>
 /// Needs ref to a GameManager
@@ -54,48 +55,42 @@ public class UIManager : MonoBehaviour
         {
             if (ScoreManager.Instance)
             {
+                m_scorePanel.SetActive(true);
                 if (m_scoreText)
-                    m_scoreText.text = "Score : " + ScoreManager.Instance.CurrentGameScore;
+                    m_scoreText.text = Utils.GetScoreString(ScoreManager.Instance.CurrentGameScore);
 
                 if (m_elapsedTimeText)
-                {
-                    int sec = ((int)ScoreManager.Instance.ElapsedTime) % 60;
-                    if (sec >= 10)
-                        m_elapsedTimeText.text = "Time : " + ((int)(ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":" + sec.ToString();
-                    else
-                        m_elapsedTimeText.text = "Time : " + ((int)(ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":0" + sec.ToString();
-                }
+                    m_elapsedTimeText.text = Utils.GetElapsedTimeString(ScoreManager.Instance.ElapsedTime, true);
 
                 if (m_shotNumberText)
-                    m_shotNumberText.text = "Shots : " + ScoreManager.Instance.ShotNumber;
+                    m_shotNumberText.text = Utils.GetShotsNumberString(ScoreManager.Instance.ShotNumber);
             }
             else
             {
                 m_scorePanel.SetActive(false);
             }
         }
-    }   
+    }
 
     public void OnGameOver()
     {
-        if (ScoreManager.Instance && m_gameOverPanel)
-        {
-            m_gameOverPanel.SetActive(true);
-
-            if (m_gameOverScoreText)
-                m_gameOverScoreText.text = "Score : " + ScoreManager.Instance.CurrentGameScore;
-
-            if (m_gameOverElapsedTimeText)
+        if (m_gameOverPanel)
+        { 
+            if (ScoreManager.Instance)
             {
-                int sec = ((int)ScoreManager.Instance.ElapsedTime) % 60;
-                if (sec >= 10)
-                    m_gameOverElapsedTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":" + sec.ToString();
-                else
-                    m_gameOverElapsedTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.ElapsedTime / 60)).ToString() + ":0" + sec.ToString();
-            }
+                m_gameOverPanel.SetActive(true);
 
-            if(m_gameOverShotNumberText)
-                m_gameOverShotNumberText.text = "Shots : " + ScoreManager.Instance.ShotNumber;
+                if (m_gameOverScoreText)
+                    m_gameOverScoreText.text = Utils.GetScoreString(ScoreManager.Instance.CurrentGameScore);
+
+                if (m_gameOverElapsedTimeText)
+                    m_gameOverElapsedTimeText.text = Utils.GetElapsedTimeString(ScoreManager.Instance.ElapsedTime);
+
+                if (m_gameOverShotNumberText)
+                    m_gameOverShotNumberText.text = Utils.GetShotsNumberString(ScoreManager.Instance.ShotNumber);
+            }
+            else
+                m_gameOverPanel.SetActive(false);
         }
     }
 

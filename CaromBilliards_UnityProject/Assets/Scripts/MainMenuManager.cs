@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using CaromBilliards;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -33,27 +34,32 @@ public class MainMenuManager : MonoBehaviour
         {
             m_masterVolumeSlider.gameObject.SetActive(false);
             m_difficultyDropdown.gameObject.SetActive(false);
-        }      
+        }
 
-
-        if (ScoreManager.Instance)
+        if (m_lastGameScoreParent)
         {
-            if(ScoreManager.Instance.LastGameScore != null)
+            if (ScoreManager.Instance)
             {
-                m_lastGameScoreParent.SetActive(true);
-                m_lastGameScoreText.text = "Score : " + ScoreManager.Instance.LastGameScore.m_score;
-                m_lastGameShotsText.text = "Shots : " + ScoreManager.Instance.LastGameScore.m_shotNumber;
+                if (ScoreManager.Instance.LastGameScore != null)
+                {
+                    m_lastGameScoreParent.SetActive(true);
 
-                int sec = ((int)ScoreManager.Instance.LastGameScore.m_elapsedTime) % 60;
-                if (sec >= 10)
-                    m_lastGameTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":" + sec.ToString();
+                    if (m_lastGameScoreText)
+                        m_lastGameScoreText.text = Utils.GetScoreString(ScoreManager.Instance.LastGameScore.m_score);
+
+                    if (m_lastGameTimeText)
+                        m_lastGameTimeText.text = Utils.GetElapsedTimeString(ScoreManager.Instance.LastGameScore.m_elapsedTime);
+
+                    if (m_lastGameShotsText)
+                        m_lastGameShotsText.text = Utils.GetShotsNumberString(ScoreManager.Instance.LastGameScore.m_shotNumber);
+                }
                 else
-                    m_lastGameTimeText.text = "Elapsed Time : " + ((int)(ScoreManager.Instance.LastGameScore.m_elapsedTime / 60)).ToString() + ":0" + sec.ToString();
+                {
+                    m_lastGameScoreParent.SetActive(false);
+                }
             }
             else
-            {
                 m_lastGameScoreParent.SetActive(false);
-            }
         }
     }
 
