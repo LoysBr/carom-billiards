@@ -22,9 +22,16 @@ public class GameManager : MonoBehaviour
     private Vector3 m_yellowBallStartPos;
     private Vector3 m_redBallStartPos;
 
-    public float    m_ballsMaxSpeed; //in m/s
-    public float    m_endOfShotWaitDuration;
-    public int      m_gameOverScoreToReach;
+    
+    [SerializeField]
+    private float   m_shotMaxHoldDuration;
+    public float    ShotMaxHoldDuration { get { return m_shotMaxHoldDuration; } }
+    [SerializeField]
+    private float   m_ballsMaxSpeed; //in m/s
+    [SerializeField]
+    private float   m_endOfShotWaitDuration;
+    [SerializeField]
+    private int     m_gameOverScoreToReach;
 
     private float   m_endOfShotWaitTimer;
 

@@ -417,7 +417,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_mouseXSpeedFactor: 2.14
-  m_shotMaxPressDuration: 1
 --- !u!4 &191845588
 Transform:
   m_ObjectHideFlags: 0
@@ -893,6 +892,7 @@ MonoBehaviour:
   m_whiteBall: {fileID: 2100364522}
   m_redBall: {fileID: 361072065}
   m_yellowBall: {fileID: 627151629}
+  m_shotMaxHoldDuration: 1
   m_ballsMaxSpeed: 5
   m_endOfShotWaitDuration: 2
   m_gameOverScoreToReach: 1

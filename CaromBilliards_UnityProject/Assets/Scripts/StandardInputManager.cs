@@ -12,9 +12,7 @@ public class StandardInputManager : InputManager
     #region Tweak
     [Range(1, 6)]
     [SerializeField]
-    private float m_mouseXSpeedFactor;
-    [SerializeField]
-    private float m_shotMaxPressDuration;
+    private float m_mouseXSpeedFactor;    
     #endregion
         
     //public delegate void InputShot(float _power);
@@ -51,14 +49,14 @@ public class StandardInputManager : InputManager
         {
             if(m_lastFrameSpaceKeyPressed)
             {
-                if(m_shotCurrentPressDuration < m_shotMaxPressDuration)
+                if(m_shotCurrentPressDuration < GameManager.Instance.ShotMaxHoldDuration)
                 {
                     m_shotCurrentPressDuration += Time.deltaTime;
                     InvokeInputShotHoldEvent(GetShotPower());
                 }
                 else        // Max power !!!!
                 {
-                    m_shotCurrentPressDuration = m_shotMaxPressDuration;
+                    m_shotCurrentPressDuration = GameManager.Instance.ShotMaxHoldDuration;
 
                     InvokeInputShotHoldEvent(1);
                     InvokeInputShotEvent(1);
@@ -84,7 +82,7 @@ public class StandardInputManager : InputManager
 
     public float GetShotPower()
     {
-        return m_shotCurrentPressDuration / m_shotMaxPressDuration;
+        return m_shotCurrentPressDuration / GameManager.Instance.ShotMaxHoldDuration;
     }
 
     public void ManageMouseInputs()
