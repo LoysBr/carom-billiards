@@ -3,24 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Private Singleton other objects optionnaly find via FindObjectOfType
-/// Not necessary to play the game
+/// - Private Singleton that other objects optionnaly find via FindObjectOfType
+/// - Not necessary to play the game
+/// - Save preferences into PlayerPrefs
+/// - If you want to do tests you can manually set values and uncheck 'm_saveAndLoadInPlayerPrefs'
 /// </summary>
 public class PlayerPreferences : MonoBehaviour
 {
+    /// <summary>
+    /// The classic flow is to open MainMenu which will set player prefs, save them 
+    /// thanks to this script, then open a Game Scene and use them. If we just want to test
+    /// with other values (eg opening GameScene directly) we can disable this m_saveAndLoadInPlayerPrefs
+    /// to force values and set them in Unity Inspector.
+    /// </summary>
+    [SerializeField]
+    private bool m_saveAndLoadInPlayerPrefs; 
+
     private static PlayerPreferences m_instance;
 
-    [HideInInspector]
-    public float m_masterVolumeValue;
+    private const string KEY_VOLUME = "volume";
+    private const string KEY_DIFFICULTY = "difficulty";
 
-    public enum Difficulty
+    [SerializeField]
+    private float m_masterVolumeValue;
+    public float MasterVolume
+    {
+        get
+        {
+            return m_masterVolumeValue;
+        }
+        set
+        {
+            m_masterVolumeValue = value;
+            if (m_saveAndLoadInPlayerPrefs)
+                PlayerPrefs.SetFloat(KEY_VOLUME, m_masterVolumeValue);
+        }
+    }    
+
+    public enum GameDifficulty
     {
         Easy,
         Medium,
         Hard
     }
-    public Difficulty m_difficulty;
-    
+
+    [SerializeField]
+    private GameDifficulty m_difficulty;
+    public GameDifficulty Difficulty
+    {
+        get
+        {
+            return m_difficulty;
+        }
+        set
+        {
+            m_difficulty = value;
+
+            if(m_saveAndLoadInPlayerPrefs)
+                PlayerPrefs.SetInt(KEY_DIFFICULTY, (int) m_difficulty);
+        }
+    }
+
     void Awake()
     {
         if(m_instance == null)     //first opening of menu
@@ -34,8 +77,18 @@ public class PlayerPreferences : MonoBehaviour
             {
                 DestroyImmediate(this.gameObject);     
             }
-        }        
+        }
 
-        m_masterVolumeValue = 1.0f;
-    }          
+
+        if (PlayerPrefs.HasKey(KEY_VOLUME) && m_saveAndLoadInPlayerPrefs)
+        {
+            m_masterVolumeValue = PlayerPrefs.GetFloat(KEY_VOLUME);
+        }
+
+        if (PlayerPrefs.HasKey(KEY_DIFFICULTY) && m_saveAndLoadInPlayerPrefs)
+        {
+            m_difficulty = (GameDifficulty)PlayerPrefs.GetInt(KEY_DIFFICULTY);
+        }
+    }        
+    
 }

@@ -44,8 +44,13 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField]
     private InputManager m_inputManager;
-    [SerializeField]
-    private PlayerPreferences m_gameSettings;
+    
+    private PlayerPreferences.GameDifficulty m_gameDifficulty;
+    public void SetGameDifficulty(PlayerPreferences.GameDifficulty _difficulty)
+    {
+        m_gameDifficulty = _difficulty;
+        InitAimHelpers();
+    }
 
     public delegate void CameraChangedAimDirection(Vector3 _direction);
     public event CameraChangedAimDirection CameraChangedAimDirectionEvent;
@@ -58,31 +63,31 @@ public class CameraManager : MonoBehaviour
         m_inputManager.InputCameraRotationEvent += RotateCameraByAngle;
 
         if (GameManager.Instance)
-            m_ballToFocus = GameManager.Instance.m_whiteBall.transform;
+            m_ballToFocus = GameManager.Instance.m_whiteBall.transform;        
+    }
 
-        if (m_gameSettings)
+    private void InitAimHelpers()
+    {
+        if (m_aimHelpers != null)
+            DeleteAimHelpers();
+        
+        switch (m_gameDifficulty)
         {
-            switch (m_gameSettings.m_difficulty)
-            {
-                case PlayerPreferences.Difficulty.Easy:
-                    m_numberOfAimHelperRays = 4;
-                    break;
-                case PlayerPreferences.Difficulty.Medium:
-                    m_numberOfAimHelperRays = 2;
-                    break;
-                case PlayerPreferences.Difficulty.Hard:
-                    m_numberOfAimHelperRays = 0;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-            m_numberOfAimHelperRays = 4;
-
+            case PlayerPreferences.GameDifficulty.Easy:
+                m_numberOfAimHelperRays = 4;
+                break;
+            case PlayerPreferences.GameDifficulty.Medium:
+                m_numberOfAimHelperRays = 2;
+                break;
+            case PlayerPreferences.GameDifficulty.Hard:
+                m_numberOfAimHelperRays = 0;
+                break;
+            default:
+                break;
+        }   
 
         m_aimHelpers = new List<GameObject>(m_numberOfAimHelperRays);
-        for(int i = 0; i < m_numberOfAimHelperRays; i++)
+        for (int i = 0; i < m_numberOfAimHelperRays; i++)
         {
             m_aimHelpers.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
             m_aimHelpers[i].SetActive(false);
@@ -103,58 +108,7 @@ public class CameraManager : MonoBehaviour
         {
             m_aimHelpers[i].SetActive(_b);
         }
-    }
-
-    private void Update()
-    {
-        if (m_numberOfAimHelperRays > 0)
-        {
-            if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
-            {               
-                SetActiveAimHelpers(true);                
-
-                //AIMING HELPER
-                Vector3 lastPos = m_ballToFocus.position;
-                Vector3 lastDirection = new Vector3(this.transform.forward.x, 0, this.transform.forward.z).normalized;
-                RaycastHit hit;
-
-                for (int i = 0; i < m_numberOfAimHelperRays; i++)
-                {
-                    if (Physics.Raycast(lastPos, lastDirection, out hit, 10))
-                    {
-                        //Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
-                     
-                        m_aimHelpers[i].transform.localScale = new Vector3(m_aimHelperthickness, m_aimHelperthickness, hit.distance);
-                        m_aimHelpers[i].transform.localPosition = (hit.point + lastPos) * 0.5f;
-                        m_aimHelpers[i].transform.localRotation = Quaternion.FromToRotation(Vector3.forward, lastDirection);
-
-                        //we don't show any helper after ball collision
-                        //with physics we cannot predict
-                        if (Mathf.Pow(2, hit.collider.gameObject.layer) == m_ballsLayer.value)
-                        {
-                            for (int j = i + 1; j < m_numberOfAimHelperRays; j++)
-                            {
-                                m_aimHelpers[j].SetActive(false);
-                            }
-                            break;
-                        }                            
-
-                        Vector3 newPos = hit.point;
-                        Vector3 newDir = Vector3.Reflect(lastDirection, hit.normal);
-                        lastDirection = newDir;
-                        lastPos = newPos;
-                    }
-                }
-            }
-            else
-            {
-                if (m_aimHelpers[0].activeSelf)
-                {
-                    SetActiveAimHelpers(false);
-                }
-            }
-        }
-    }
+    }    
 
     public void DisableAimHelpers()
     {
@@ -162,6 +116,78 @@ public class CameraManager : MonoBehaviour
         {
             m_aimHelpers[i].SetActive(false);
         }
+    }
+
+    public void DeleteAimHelpers()
+    {
+        for (int i = 0; i < m_aimHelpers.Count; i++)
+        {
+            if(m_aimHelpers[i])
+                GameObject.DestroyImmediate(m_aimHelpers[i]);
+        }
+
+        m_aimHelpers = new List<GameObject>();
+    }
+
+    //We update Aim Helpers objects depending of camera direction
+    private void Update()
+    {
+        if (m_aimHelpers == null)
+        {
+            //this case is triggered only if nobody called SetGameDifficulty()
+            //should be done by GameManager
+            InitAimHelpers();
+        }
+        else
+        {
+            if (m_numberOfAimHelperRays > 0)
+            {
+                if (GameManager.Instance && GameManager.Instance.CurrentGameState == GameManager.GameState.Shooting)
+                {
+                    SetActiveAimHelpers(true);
+
+                    //AIMING HELPER
+                    Vector3 lastPos = m_ballToFocus.position;
+                    Vector3 lastDirection = new Vector3(this.transform.forward.x, 0, this.transform.forward.z).normalized;
+                    RaycastHit hit;
+
+                    for (int i = 0; i < m_numberOfAimHelperRays; i++)
+                    {
+                        if (Physics.Raycast(lastPos, lastDirection, out hit, 10))
+                        {
+                            //Debug.DrawRay(lastPos, lastDirection.normalized * hit.distance, Color.yellow);                   
+
+                            m_aimHelpers[i].transform.localScale = new Vector3(m_aimHelperthickness, m_aimHelperthickness, hit.distance);
+                            m_aimHelpers[i].transform.localPosition = (hit.point + lastPos) * 0.5f;
+                            m_aimHelpers[i].transform.localRotation = Quaternion.FromToRotation(Vector3.forward, lastDirection);
+
+                            //we don't show any helper after ball collision
+                            //with physics we cannot predict
+                            if (Mathf.Pow(2, hit.collider.gameObject.layer) == m_ballsLayer.value)
+                            {
+                                for (int j = i + 1; j < m_numberOfAimHelperRays; j++)
+                                {
+                                    m_aimHelpers[j].SetActive(false);
+                                }
+                                break;
+                            }
+
+                            Vector3 newPos = hit.point;
+                            Vector3 newDir = Vector3.Reflect(lastDirection, hit.normal);
+                            lastDirection = newDir;
+                            lastPos = newPos;
+                        }
+                    }
+                }
+                else
+                {
+                    if (m_aimHelpers[0].activeSelf)
+                    {
+                        SetActiveAimHelpers(false);
+                    }
+                }
+            }
+        }        
     }
 
     public void RefreshCameraPosition()

@@ -20,7 +20,7 @@ public class MainMenuManager : MonoBehaviour
         m_playerPref = FindObjectOfType<PlayerPreferences>();
 
         if (m_playerPref)
-            m_masterVolumeSlider.value = m_playerPref.m_masterVolumeValue;
+            m_masterVolumeSlider.value = m_playerPref.MasterVolume;
         else
             m_masterVolumeSlider.value = 1;
         //TODO PLAYER PREF
@@ -60,7 +60,7 @@ public class MainMenuManager : MonoBehaviour
     public void OnMasterVolumeSliderChanged(float _newValue)
     {
         if(m_playerPref)
-            m_playerPref.m_masterVolumeValue = _newValue;
+            m_playerPref.MasterVolume = _newValue;
         else
         {
             //TODO PLAYER PREF save

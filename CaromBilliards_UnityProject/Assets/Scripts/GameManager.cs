@@ -9,9 +9,20 @@ using UnityEngine.SceneManagement;
 /// Needs an InputManager
 /// </summary>
 public class GameManager : MonoBehaviour
-{    
+{
+    #region Dependencies
+    //Needs an InputManager
     [SerializeField]
     private InputManager m_inputManager;
+
+    //Needs a Camera Manager
+    public CameraManager m_cameraManager;
+
+    //Optionnal PlayerPreferences
+    [SerializeField]
+    private PlayerPreferences m_playerPref;
+    public PlayerPreferences PlayerPreferences { get { return m_playerPref; } } //Used by Ball.cs and CameraManager.cs
+    #endregion
 
     public string m_menuSceneName;
 
@@ -67,26 +78,19 @@ public class GameManager : MonoBehaviour
     public event PlayerIsShootingEvent PlayerShotEvent;
     public event PlayerIsShootingEvent InputShotHoldEvent;
 
-    public delegate void EndOfShot(bool _succeed);
-    public event EndOfShot EndOfShotEvent;
+    public delegate void        EndOfShot(bool _succeed);
+    public event EndOfShot      EndOfShotEvent;
 
-    public delegate void SwitchState(GameState _newState);
-    public event SwitchState SwitchStateEvent;
+    public delegate void        SwitchState(GameState _newState);
+    public event SwitchState    SwitchStateEvent;
 
-    public delegate void GameOver();
-    public event GameOver GameOverEvent;
+    public delegate void        GameOver();
+    public event GameOver       GameOverEvent;
     #endregion
-
-    //Needs a Camera Manager
-    public CameraManager m_cameraManager;
-
-    [SerializeField]
-    private PlayerPreferences m_playerPref;
-    public PlayerPreferences PlayerPreferences { get { return m_playerPref; } }
-
+    
     #region GameState
-    public GameState CurrentGameState { get { return m_currentGameSate; } }
-    private GameState m_currentGameSate;   
+    public GameState            CurrentGameState { get { return m_currentGameSate; } }
+    private GameState           m_currentGameSate;   
 
     public enum GameState
     {
@@ -117,8 +121,17 @@ public class GameManager : MonoBehaviour
     void Start()
     {        
         m_inputManager.InputShotHoldEvent += OnInputShotHold;
-
         m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
+
+        //if we didn't manually set a PlayerPref  
+        //OR if we come from MainMenu and another instance of
+        //PlayerPref overrided our reference, let's try to find one
+        if (m_playerPref == null) 
+        {
+            m_playerPref = FindObjectOfType<PlayerPreferences>();
+        }
+
+        m_cameraManager.SetGameDifficulty(m_playerPref ? m_playerPref.Difficulty : PlayerPreferences.GameDifficulty.Easy);
 
         m_whiteBall.m_maxSpeed = m_yellowBall.m_maxSpeed = m_redBall.m_maxSpeed = m_ballsMaxSpeed;
         m_whiteBallStartPos = m_whiteBall.transform.position;

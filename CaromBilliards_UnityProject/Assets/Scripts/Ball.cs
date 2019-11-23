@@ -145,7 +145,7 @@ public class Ball : MonoBehaviour
     public void PlayCushionCollisionSound(float _volume)
     {
         if(GameManager.Instance.PlayerPreferences)
-            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameManager.Instance.PlayerPreferences.m_masterVolumeValue);
+            m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume * GameManager.Instance.PlayerPreferences.MasterVolume);
         else
             m_audioSource.PlayOneShot(m_cushionCollisionSound, _volume);
     }
@@ -153,7 +153,7 @@ public class Ball : MonoBehaviour
     public void PlayBallCollisionSound(float _volume)
     {
         if (GameManager.Instance.PlayerPreferences)
-            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameManager.Instance.PlayerPreferences.m_masterVolumeValue);
+            m_audioSource.PlayOneShot(m_ballCollisionSound, _volume * GameManager.Instance.PlayerPreferences.MasterVolume);
         else
             m_audioSource.PlayOneShot(m_ballCollisionSound, _volume);
     }
