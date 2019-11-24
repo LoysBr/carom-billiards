@@ -99,7 +99,8 @@ public class GameManager : MonoBehaviour
     {
         Shooting,
         ProcessingShot,
-        EndOfShot,
+        EndOfShotScoredPoint,
+        EndOfShotNoPoint,
         PreReplay,
         ProcessingReplay,
         FinalizeReplay,
@@ -162,10 +163,15 @@ public class GameManager : MonoBehaviour
             case GameState.ProcessingShot:
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    SwitchGameState(GameState.EndOfShot);
+                    bool scored = m_whiteBall.HasCollidedWithTwoOtherBalls();
+
+                    if(scored)
+                        SwitchGameState(GameState.EndOfShotScoredPoint);
+                    else
+                        SwitchGameState(GameState.EndOfShotNoPoint);
                 }
                 break;
-            case GameState.EndOfShot:
+            case GameState.EndOfShotScoredPoint:
                 m_endOfShotWaitTimer += Time.deltaTime;
                 if(m_endOfShotWaitTimer >= m_endOfShotWaitDuration)
                 {
@@ -200,21 +206,20 @@ public class GameManager : MonoBehaviour
     private void SwitchGameState(GameState _state)
     {
         m_currentGameSate = _state;
+        SwitchStateEvent?.Invoke(m_currentGameSate);
+
         switch (m_currentGameSate)
         {
-            case GameState.Shooting:                
+            case GameState.Shooting:
+                ResetBallsCollisionsData();
                 m_inputManager.InputShotEvent += OnPlayerShot;
                 m_cameraManager.SetCameraPositionWithAngleFromBase(0f);
                 break;
             case GameState.ProcessingShot:
                 m_inputManager.InputShotEvent -= OnPlayerShot;
                 break;
-            case GameState.EndOfShot: 
-                EndOfShotEvent?.Invoke(m_whiteBall.HasCollidedWithTwoOtherBalls());
-                m_whiteBall.ResetLastShotCollisions();
-                m_yellowBall.ResetLastShotCollisions();
-                m_redBall.ResetLastShotCollisions();
-                m_endOfShotWaitTimer = 0;
+            case GameState.EndOfShotScoredPoint: 
+                EndOfShotEvent?.Invoke(true);
 
                 //checking if Game is over
                 if (ScoreManager.Instance)
@@ -229,6 +234,10 @@ public class GameManager : MonoBehaviour
                     Debug.LogError("Without a ScoreManager there will be no GameOver.");
                 }
                 break;
+            case GameState.EndOfShotNoPoint:
+                EndOfShotEvent?.Invoke(false);
+                SwitchGameState(GameState.Shooting);
+                break;
             case GameState.PreReplay:
                 break;
             case GameState.ProcessingReplay:
@@ -239,9 +248,14 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 break;
-        }
+        }        
+    }
 
-        SwitchStateEvent?.Invoke(m_currentGameSate);
+    private void ResetBallsCollisionsData()
+    {
+        m_whiteBall.ResetLastShotCollisions();
+        m_yellowBall.ResetLastShotCollisions();
+        m_redBall.ResetLastShotCollisions();
     }
 
     public void RestartGame()

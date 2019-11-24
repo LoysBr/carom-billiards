@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     public Text         m_scoreText;
     public Text         m_elapsedTimeText;
     public Text         m_shotNumberText;
+    public GameObject   m_scoredPointPanel;
 
     public GameObject   m_gameOverPanel;
     //I duplicated the score objects for game over panel in case we maybe don't 
@@ -47,6 +48,8 @@ public class UIManager : MonoBehaviour
             m_replayButton.SetActive(false);
         if (m_gameOverPanel)
             m_gameOverPanel.SetActive(false);
+        if(m_scoredPointPanel)
+            m_scoredPointPanel.SetActive(false);
     }
 
     private void Update()
@@ -142,13 +145,21 @@ public class UIManager : MonoBehaviour
         switch (_state)
         {
             case GameManager.GameState.Shooting:
+                if (m_scoredPointPanel)
+                    m_scoredPointPanel.SetActive(false);
                 break;
             case GameManager.GameState.ProcessingShot:
                 if(m_replayButton)
                     m_replayButton.SetActive(false);
                 break;
-            case GameManager.GameState.EndOfShot:
+            case GameManager.GameState.EndOfShotScoredPoint:
                 if(m_replayButton)
+                    m_replayButton.SetActive(true);
+                if (m_scoredPointPanel)
+                    m_scoredPointPanel.SetActive(true);
+                break;
+            case GameManager.GameState.EndOfShotNoPoint:
+                if (m_replayButton)
                     m_replayButton.SetActive(true);
                 break;
             case GameManager.GameState.PreReplay:
