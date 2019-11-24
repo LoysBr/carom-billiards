@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour
         public Vector3 redBallPos;
         public Vector3 shotDirection;
         public float   shotPower; //0 to 1
-        public float   cameraAngleFromBase; //the m_angleOffsetFromBaseDir, used to calculate camera position 
+        public float   cameraAngle; //the m_angleOffsetFromBaseDir, used to calculate camera position 
     }
 
     private ReplayShotData m_lastShotData;
@@ -213,10 +213,12 @@ public class GameManager : MonoBehaviour
             case GameState.Shooting:
                 ResetBallsCollisionsData();
                 m_inputManager.InputShotEvent += OnPlayerShot;
-                m_cameraManager.SetCameraPositionWithAngleFromBase(0f);
+                m_inputManager.InputMoveCameraEvent += OnMoveCameraInput;
+                m_cameraManager.SetCameraPositionWithAngle(0f);
                 break;
             case GameState.ProcessingShot:
                 m_inputManager.InputShotEvent -= OnPlayerShot;
+                m_inputManager.InputMoveCameraEvent -= OnMoveCameraInput;
                 break;
             case GameState.EndOfShotScoredPoint: 
                 EndOfShotEvent?.Invoke(true);
@@ -239,6 +241,7 @@ public class GameManager : MonoBehaviour
                 SwitchGameState(GameState.Shooting);
                 break;
             case GameState.PreReplay:
+                m_inputManager.InputMoveCameraEvent -= OnMoveCameraInput;
                 break;
             case GameState.ProcessingReplay:
                 m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
@@ -293,7 +296,7 @@ public class GameManager : MonoBehaviour
         m_lastShotData.redBallPos = m_redBall.gameObject.transform.position;
         m_lastShotData.shotDirection = m_shotAimDirection.normalized;
         m_lastShotData.shotPower = _shotPower;
-        m_lastShotData.cameraAngleFromBase = m_cameraManager.AimAngleFromBase;
+        m_lastShotData.cameraAngle = m_cameraManager.AimAngleFromBase;
     }
 
     private void PlaceElementsLikeBeforeShot()
@@ -303,12 +306,17 @@ public class GameManager : MonoBehaviour
         m_yellowBall.gameObject.transform.position = m_lastShotData.yellowBallPos;
         m_redBall.gameObject.transform.position = m_lastShotData.redBallPos;
 
-        m_cameraManager.SetCameraPositionWithAngleFromBase(m_lastShotData.cameraAngleFromBase);
+        m_cameraManager.SetCameraPositionWithAngle(m_lastShotData.cameraAngle);
     }
 
     private void OnAimDirectionChanged(Vector3 _direction)
     {
         m_shotAimDirection = _direction;
+    }
+
+    private void OnMoveCameraInput(float _val)
+    {
+        m_cameraManager.MoveCameraInput(_val);
     }
 
     public void StartReplay()

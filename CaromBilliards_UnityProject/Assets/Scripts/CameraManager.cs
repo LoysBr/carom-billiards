@@ -6,7 +6,7 @@ public class CameraManager : MonoBehaviour
 {     
     //By default, Camera will be aligned to this point
     //I choose the middle of the billiard table
-    public Transform m_referencePointForOrientation;
+    public Transform m_focusPoint;
 
     //the distance between Camera and focused ball
     //if we stay in table's plan
@@ -28,7 +28,7 @@ public class CameraManager : MonoBehaviour
 
     //Camera will always look in this direction
     [SerializeField]
-    private Transform       m_ballToFocus;
+    private Transform       m_ball;
 
     #region AimHelper
     private List<GameObject> m_aimHelpers;
@@ -44,9 +44,6 @@ public class CameraManager : MonoBehaviour
     [SerializeField]
     private LayerMask   m_ballsLayer;
     #endregion
-
-    [SerializeField]
-    private InputManager m_inputManager;
     
     private PlayerPreferences.GameDifficulty m_gameDifficulty;
     public void SetGameDifficulty(PlayerPreferences.GameDifficulty _difficulty)
@@ -60,9 +57,7 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {      
-        m_angleOffsetFromBaseDir = 0f;
-
-        m_inputManager.InputCameraRotationEvent += RotateCameraByAngle;           
+        m_angleOffsetFromBaseDir = 0f;     
     }
 
     private void InitAimHelpers()
@@ -131,7 +126,7 @@ public class CameraManager : MonoBehaviour
     //We update Aim Helpers objects depending of camera direction
     private void Update()
     {
-        if (!m_ballToFocus)
+        if (!m_ball)
         {
             Debug.LogError("CameraManager needs a 'ballToFocus'.");
             return;
@@ -159,7 +154,7 @@ public class CameraManager : MonoBehaviour
                     SetActiveAimHelpers(true);
 
                     //AIMING HELPER
-                    Vector3 lastPos = m_ballToFocus.position;
+                    Vector3 lastPos = m_ball.position;
                     Vector3 lastDirection = new Vector3(this.transform.forward.x, 0, this.transform.forward.z).normalized;
                     RaycastHit hit;
 
@@ -195,43 +190,55 @@ public class CameraManager : MonoBehaviour
         }        
     }
 
-    private void RefreshCameraPosition()
+    private Vector3 FindCameraPosition(Vector3 _ballPos, Vector3 _focus, float _angle)
     {
         //let's find Camera position in the 2D plan of the table (ball height)
         //I'll use Vector2's 'y' for real 'z'
-        Vector2 ballPos = new Vector2(m_ballToFocus.position.x, m_ballToFocus.position.z);
+        Vector2 ballPos = new Vector2(_ballPos.x, _ballPos.z);
+
         //baseOrientPoint is the point we use to align camera and ball with
-        Vector2 baseOrientPoint = new Vector2(m_referencePointForOrientation.position.x, m_referencePointForOrientation.position.z);
-        Vector2 ballToOrient = baseOrientPoint - ballPos;
-        //we just need directions and angle, normalizing will simplify calculations
-        Vector2 orientNorm = ballToOrient.normalized;
+        Vector2 focusPoint = new Vector2(_focus.x, _focus.z);
+
+        Vector2 ballToFocusVec = focusPoint - ballPos;
+        Vector2 direction = ballToFocusVec.normalized;
 
         //angle between X axis and 'ballToOrient' vector
         float baseAngle = 0;
-        if (Vector2.Dot(new Vector2(0, 1), orientNorm) >= 0)
+        if (Vector2.Dot(new Vector2(0, 1), direction) >= 0)
         {
-            baseAngle = Mathf.Acos(orientNorm.x);
+            baseAngle = Mathf.Acos(direction.x);
         }
         else
         {
-            baseAngle = 2 * Mathf.PI - Mathf.Acos(orientNorm.x);
+            baseAngle = 2 * Mathf.PI - Mathf.Acos(direction.x);
         }
 
-        //I calculate a new "orientation point" from "base orientation point" with an offset angle
-        Vector2 newOrientPoint = new Vector2(Mathf.Cos(baseAngle + m_angleOffsetFromBaseDir) + ballPos.x, Mathf.Sin(baseAngle + m_angleOffsetFromBaseDir) + ballPos.y);
+        //I calculate a new "focus point" from "base focus point" with an offset angle
+        Vector2 newFocusPoint = new Vector2(Mathf.Cos(baseAngle + _angle) + ballPos.x, Mathf.Sin(baseAngle + _angle) + ballPos.y);
 
-        Vector2 posCamera2D = ballPos + (ballPos - newOrientPoint) * m_horizontalDistanceToBall;
+        Vector2 posCamera2D = ballPos + (ballPos - newFocusPoint) * m_horizontalDistanceToBall;
 
         //now we have the new camera position in this 2D Plan, we just have to add the Height
-        Vector3 newCameraPos = new Vector3(posCamera2D.x, m_ballToFocus.position.y + m_cameraHeight, posCamera2D.y);
+        Vector3 newCameraPos = new Vector3(posCamera2D.x, _ballPos.y + m_cameraHeight, posCamera2D.y);
 
-        this.gameObject.transform.position = newCameraPos;
+        return newCameraPos;
     }
 
-    private void RefreshCameraOrientation()
+    private void FindPositionAndMove()
+    {        
+        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
+    }
+
+    //private void ResetPosition()
+    //{
+    //    m_angleOffsetFromBaseDir = 0f;
+    //    FindPositionAndMove();
+    //}
+
+    private void FindOrientationAndRotate()
     {
         //Find the direction of Camera with angle = 0 (horizontal plan)
-        Vector3 baseDirPoint = new Vector3(m_ballToFocus.position.x, this.transform.position.y, m_ballToFocus.position.z);
+        Vector3 baseDirPoint = new Vector3(m_ball.position.x, this.transform.position.y, m_ball.position.z);
         Vector3 baseDir = baseDirPoint - this.transform.position;
 
         //Calculate vertical distance offset between newDir and baseDir points
@@ -243,20 +250,20 @@ public class CameraManager : MonoBehaviour
 
          CameraChangedAimDirectionEvent?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
     }
-
-    private void RotateCameraByAngle(float _angle)
+    
+    public void MoveCameraInput(float _angle)
     {
         m_angleOffsetFromBaseDir += _angle;
 
-        RefreshCameraPosition();
-        RefreshCameraOrientation();
+        FindPositionAndMove();
+        FindOrientationAndRotate();
     }
 
-    public void SetCameraPositionWithAngleFromBase(float _angle)
+    public void SetCameraPositionWithAngle(float _angle)
     {
         m_angleOffsetFromBaseDir = _angle;
 
-        RefreshCameraPosition();
-        RefreshCameraOrientation();
+        FindPositionAndMove();
+        FindOrientationAndRotate();
     }
 }

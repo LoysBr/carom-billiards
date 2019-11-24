@@ -5,8 +5,8 @@ public class InputManager : MonoBehaviour
     public delegate void    InputShot(float _power);
     public event            InputShot InputShotEvent;
     public event            InputShot InputShotHoldEvent;
-    public delegate void    InputCameraRotation(float _angle);
-    public event            InputCameraRotation InputCameraRotationEvent;
+    public delegate void    InputMoveCamera(float _angle);
+    public event            InputMoveCamera InputMoveCameraEvent;
 
     [HideInInspector]
     public float m_shotMaxHoldDuration;
@@ -21,6 +21,6 @@ public class InputManager : MonoBehaviour
     }
     public void InvokeInputCameraRotationEvent(float _angle)
     {
-        InputCameraRotationEvent?.Invoke(_angle);
+        InputMoveCameraEvent?.Invoke(_angle);
     }
 }

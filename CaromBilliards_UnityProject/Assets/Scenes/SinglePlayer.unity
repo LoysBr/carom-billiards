@@ -528,11 +528,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ea1e35b8877d52498ebe6367b4d0bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_referencePointForOrientation: {fileID: 1961240310}
+  m_focusPoint: {fileID: 1961240310}
   m_horizontalDistanceToBall: 1.5
   m_cameraHeight: 1.5
   m_cameraPitchAngle: 40
-  m_ballToFocus: {fileID: 2100364521}
+  m_ball: {fileID: 2100364521}
   m_aimHelperthickness: 0.015
   m_aimHelperColor: {r: 0.3501618, g: 0.7924528, b: 0.31025273, a: 1}
   m_ballsLayer:
