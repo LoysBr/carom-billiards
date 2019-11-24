@@ -151,7 +151,15 @@ public class UIManager : MonoBehaviour
                 if(m_replayButton)
                     m_replayButton.SetActive(true);
                 break;
+            case GameManager.GameState.PreReplay:
+                if (m_replayButton)
+                    m_replayButton.SetActive(false);
+                break;
             case GameManager.GameState.ProcessingReplay:
+                break;
+            case GameManager.GameState.FinalizeReplay:
+                if (m_replayButton)
+                    m_replayButton.SetActive(true);
                 break;
             default:
                 break;

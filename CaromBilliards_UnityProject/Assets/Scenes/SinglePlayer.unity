@@ -898,6 +898,7 @@ MonoBehaviour:
   m_ballsMaxSpeed: 5
   m_endOfShotWaitDuration: 2
   m_gameOverScoreToReach: 1
+  m_preReplayDuration: 1
 --- !u!4 &375293573
 Transform:
   m_ObjectHideFlags: 0

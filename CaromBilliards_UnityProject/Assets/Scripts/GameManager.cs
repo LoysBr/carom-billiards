@@ -100,7 +100,9 @@ public class GameManager : MonoBehaviour
         Shooting,
         ProcessingShot,
         EndOfShot,
+        PreReplay,
         ProcessingReplay,
+        FinalizeReplay,
         GameOverScreen
     }
     #endregion
@@ -117,6 +119,9 @@ public class GameManager : MonoBehaviour
     }
 
     private ReplayShotData m_lastShotData;
+
+    public float  m_preReplayDuration; //we wait a bit before shooting
+    private float m_preReplayTimer;
     #endregion
 
     private Vector3 m_shotAimDirection; //the horizontal/flat ball shot direction    
@@ -143,6 +148,8 @@ public class GameManager : MonoBehaviour
         m_yellowBallStartPos = m_yellowBall.transform.position;
         m_redBallStartPos = m_redBall.transform.position;
 
+        m_preReplayTimer = 0f;
+
         SwitchGameState(GameState.Shooting);        
     }
 
@@ -165,11 +172,25 @@ public class GameManager : MonoBehaviour
                     SwitchGameState(GameState.Shooting);
                 }
                 break;
-            case GameState.ProcessingReplay:
+            case GameState.PreReplay:
+                if (m_preReplayTimer <= m_preReplayDuration)
+                {
+                    m_preReplayTimer += Time.deltaTime;
+                }
+                else
+                {
+                    m_preReplayTimer = 0f;
+                    SwitchGameState(GameState.ProcessingReplay);
+                }
+                break;
+            case GameState.ProcessingReplay: 
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    SwitchGameState(GameState.Shooting);
+                    SwitchGameState(GameState.FinalizeReplay);
                 }
+                break;
+            case GameState.FinalizeReplay:
+                SwitchGameState(GameState.Shooting);                
                 break;
             default:
                 break;
@@ -208,7 +229,10 @@ public class GameManager : MonoBehaviour
                     Debug.LogError("Without a ScoreManager there will be no GameOver.");
                 }
                 break;
+            case GameState.PreReplay:
+                break;
             case GameState.ProcessingReplay:
+                m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
                 break;
             case GameState.GameOverScreen:
                 GameOverEvent?.Invoke();
@@ -275,14 +299,8 @@ public class GameManager : MonoBehaviour
 
     public void StartReplay()
     {
-        Debug.Log("start replay");
-
-        SwitchGameState(GameState.ProcessingReplay);
+        SwitchGameState(GameState.PreReplay);
         PlaceElementsLikeBeforeShot();
-
-        //attendre un peu TODO
-
-        m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
     }
 
     private void ResetBallsPos()
