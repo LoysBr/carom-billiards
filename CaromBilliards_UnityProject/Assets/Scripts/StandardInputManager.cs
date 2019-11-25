@@ -20,7 +20,6 @@ public class StandardInputManager : InputManager
 
 
     //Mouse
-    private Vector3     m_previousMousePosition;
     private bool        m_lastFrameMouseLeftClicked;
 
     //Space key
@@ -40,7 +39,7 @@ public class StandardInputManager : InputManager
 
     private void ManageSpacePressure()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetButton("Jump"))
         {
             if(m_lastFrameSpaceKeyPressed)
             {
@@ -82,23 +81,11 @@ public class StandardInputManager : InputManager
 
     private void ManageMouseInputs()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetButton("Fire1"))
         {
-            Vector3 newMousePos = Input.mousePosition;
-            Vector3 deltaMouse;
+            float deltaMouse = Input.GetAxis("Mouse X"); 
 
-            if (m_lastFrameMouseLeftClicked)
-            {
-                deltaMouse = newMousePos - m_previousMousePosition;
-            }
-            else
-            {
-                deltaMouse = Vector3.one;
-            }
-
-            m_previousMousePosition = newMousePos;
-
-            InvokeInputCameraRotationEvent(- deltaMouse.x * m_mouseXSpeedFactor * Time.deltaTime * 0.04f);
+            InvokeInputCameraRotationEvent(- deltaMouse * m_mouseXSpeedFactor * Time.deltaTime);
 
             m_lastFrameMouseLeftClicked = true;
         }

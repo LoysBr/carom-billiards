@@ -52,9 +52,9 @@ public class CameraManager : MonoBehaviour
     private int         m_numberOfAimHelperRays;
 
     [SerializeField]
-    private float       m_aimHelperthickness = 0.03f;
+    private float       m_aimHelperthickness = 0.03f;    
     [SerializeField]
-    private Color       m_aimHelperColor = Color.blue;
+    private Material    m_aimHelperMaterial;
     [SerializeField]
     private LayerMask   m_ballsLayer;
     #endregion
@@ -158,7 +158,7 @@ public class CameraManager : MonoBehaviour
                 this.transform.LookAt(m_newLookAtPoint);
             }
         }
-
+        
         if (m_aimHelpers == null)
         {
             //this case is triggered only if nobody called SetGameDifficulty()
@@ -176,8 +176,8 @@ public class CameraManager : MonoBehaviour
                         SetActiveAimHelpers(false);
                     }
                 }
-                else  //If there is no GameManager (for debug / testing purpose ?) we activate AimHelpers anyway
-                { 
+                else if(!m_isInEaseMove) //If there is no GameManager (for debug / testing purpose ?) we activate AimHelpers anyway
+                {
                     SetActiveAimHelpers(true);
 
                     //AIMING HELPER
@@ -215,6 +215,7 @@ public class CameraManager : MonoBehaviour
                 }
             }
         }        
+                
     }
 
     private Vector3 FindCameraPosition(Vector3 _ballPos, Vector3 _focus, float _angle)
@@ -316,8 +317,7 @@ public class CameraManager : MonoBehaviour
             if (collider)
                 Destroy(collider);
 
-            Material material = new Material(Shader.Find("Unlit/Color"));
-            material.SetColor("_Color", m_aimHelperColor);
+            Material material = m_aimHelperMaterial;
             m_aimHelpers[i].GetComponent<MeshRenderer>().material = material;
         }
     }
