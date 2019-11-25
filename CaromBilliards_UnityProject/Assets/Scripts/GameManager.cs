@@ -214,7 +214,7 @@ public class GameManager : MonoBehaviour
                 ResetBallsCollisionsData();
                 m_inputManager.InputShotEvent += OnPlayerShot;
                 m_inputManager.InputMoveCameraEvent += OnMoveCameraInput;
-                m_cameraManager.SetCameraPositionWithAngle(0f);
+                m_cameraManager.SmoothlyMoveToNewPositionWithAngle(0f);
                 break;
             case GameState.ProcessingShot:
                 m_inputManager.InputShotEvent -= OnPlayerShot;
@@ -306,7 +306,7 @@ public class GameManager : MonoBehaviour
         m_yellowBall.gameObject.transform.position = m_lastShotData.yellowBallPos;
         m_redBall.gameObject.transform.position = m_lastShotData.redBallPos;
 
-        m_cameraManager.SetCameraPositionWithAngle(m_lastShotData.cameraAngle);
+        m_cameraManager.SmoothlyMoveToNewPositionWithAngle(m_lastShotData.cameraAngle);
     }
 
     private void OnAimDirectionChanged(Vector3 _direction)

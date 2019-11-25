@@ -44,6 +44,16 @@ public class CameraManager : MonoBehaviour
     [SerializeField]
     private LayerMask   m_ballsLayer;
     #endregion
+
+    [SerializeField]
+    private float       m_easeMoveDuration;
+    private bool        m_isInEaseMove;
+    private Vector3     m_previousPosition;
+    private Vector3     m_newPosition;
+    private Vector3     m_newLookAtPoint;
+    private float       m_easeMoveTimer;
+
+    private Vector3     m_lookAtPoint;
     
     private PlayerPreferences.GameDifficulty m_gameDifficulty;
     public void SetGameDifficulty(PlayerPreferences.GameDifficulty _difficulty)
@@ -57,70 +67,38 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {      
-        m_angleOffsetFromBaseDir = 0f;     
+        m_angleOffsetFromBaseDir = 0f;
+        m_isInEaseMove = false;
+        m_easeMoveTimer = 0f;
     }
 
-    private void InitAimHelpers()
+    public void SmoothlyMoveToNewPositionWithAngle(float _angle)
     {
-        if (m_aimHelpers != null)
-            DeleteAimHelpers();
-        
-        switch (m_gameDifficulty)
-        {
-            case PlayerPreferences.GameDifficulty.Easy:
-                m_numberOfAimHelperRays = 4;
-                break;
-            case PlayerPreferences.GameDifficulty.Medium:
-                m_numberOfAimHelperRays = 2;
-                break;
-            case PlayerPreferences.GameDifficulty.Hard:
-                m_numberOfAimHelperRays = 0;
-                break;
-            default:
-                break;
-        }   
+        m_isInEaseMove = true;
 
-        m_aimHelpers = new List<GameObject>(m_numberOfAimHelperRays);
-        for (int i = 0; i < m_numberOfAimHelperRays; i++)
-        {
-            m_aimHelpers.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
-            m_aimHelpers[i].SetActive(false);
-
-            BoxCollider collider = m_aimHelpers[i].GetComponent<BoxCollider>();
-            if (collider)
-                Destroy(collider);
-
-            Material material = new Material(Shader.Find("Unlit/Color"));
-            material.SetColor("_Color", m_aimHelperColor);
-            m_aimHelpers[i].GetComponent<MeshRenderer>().material = material;
-        }
+        m_previousPosition = transform.position;
+        //m_previousLookAtPoint = m_lookAtPoint;
+        m_newPosition = FindCameraPosition(m_ball.position, m_focusPoint.position, _angle);
+        m_newLookAtPoint = FindLookAtPoint(m_ball.position, m_newPosition);
     }
 
-    private void SetActiveAimHelpers(bool _b)
+    public void MoveCameraInput(float _angle)
     {
-        for (int i = 0; i < m_numberOfAimHelperRays; i++)
-        {
-            m_aimHelpers[i].SetActive(_b);
-        }
+        if (m_isInEaseMove)
+            return;
+
+        m_angleOffsetFromBaseDir += _angle;
+
+        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
+        FindOrientationAndRotate();
     }
 
-    private void DisableAimHelpers()
+    public void SetCameraPositionWithAngle(float _angle)
     {
-        for (int i = 0; i < m_numberOfAimHelperRays; i++)
-        {
-            m_aimHelpers[i].SetActive(false);
-        }
-    }
+        m_angleOffsetFromBaseDir = _angle;
 
-    private void DeleteAimHelpers()
-    {
-        for (int i = 0; i < m_aimHelpers.Count; i++)
-        {
-            if(m_aimHelpers[i])
-                GameObject.DestroyImmediate(m_aimHelpers[i]);
-        }
-
-        m_aimHelpers = new List<GameObject>();
+        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
+        FindOrientationAndRotate();
     }
 
     //We update Aim Helpers objects depending of camera direction
@@ -130,6 +108,26 @@ public class CameraManager : MonoBehaviour
         {
             Debug.LogError("CameraManager needs a 'ballToFocus'.");
             return;
+        }
+
+        if(m_isInEaseMove)
+        {
+            if (m_easeMoveTimer >= m_easeMoveDuration)
+            {
+                m_isInEaseMove = false;
+                m_easeMoveTimer = 0f;
+            }
+            else
+            {
+                m_easeMoveTimer += Time.deltaTime;
+
+                float t = m_easeMoveTimer / m_easeMoveDuration;
+
+                this.gameObject.transform.position = new Vector3(Mathf.Lerp(m_previousPosition.x, m_newPosition.x, t),
+                    Mathf.Lerp(m_previousPosition.y, m_newPosition.y, t), Mathf.Lerp(m_previousPosition.z, m_newPosition.z, t));
+
+                this.transform.LookAt(m_newLookAtPoint);
+            }
         }
 
         if (m_aimHelpers == null)
@@ -223,47 +221,88 @@ public class CameraManager : MonoBehaviour
 
         return newCameraPos;
     }
-
-    private void FindPositionAndMove()
-    {        
-        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
-    }
-
-    //private void ResetPosition()
-    //{
-    //    m_angleOffsetFromBaseDir = 0f;
-    //    FindPositionAndMove();
-    //}
-
-    private void FindOrientationAndRotate()
+    
+    private Vector3 FindLookAtPoint(Vector3 _ballPos, Vector3 _cameraPos)
     {
         //Find the direction of Camera with angle = 0 (horizontal plan)
-        Vector3 baseDirPoint = new Vector3(m_ball.position.x, this.transform.position.y, m_ball.position.z);
-        Vector3 baseDir = baseDirPoint - this.transform.position;
+        Vector3 baseDirPoint = new Vector3(_ballPos.x, _cameraPos.y, _ballPos.z);
+        Vector3 baseDir = baseDirPoint - _cameraPos;
 
         //Calculate vertical distance offset between newDir and baseDir points
         float verticalDist = Mathf.Abs(Mathf.Tan(m_cameraPitchAngle * Mathf.Deg2Rad) * baseDir.magnitude);
 
-        Vector3 newDirPoint = new Vector3(baseDirPoint.x, baseDirPoint.y - verticalDist, baseDirPoint.z);
+        Vector3 lookAtPoint = new Vector3(baseDirPoint.x, baseDirPoint.y - verticalDist, baseDirPoint.z);
 
-        this.transform.LookAt(newDirPoint, Vector3.up);
-
-         CameraChangedAimDirectionEvent?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
-    }
-    
-    public void MoveCameraInput(float _angle)
-    {
-        m_angleOffsetFromBaseDir += _angle;
-
-        FindPositionAndMove();
-        FindOrientationAndRotate();
+        return lookAtPoint;
     }
 
-    public void SetCameraPositionWithAngle(float _angle)
+    private void FindOrientationAndRotate()
     {
-        m_angleOffsetFromBaseDir = _angle;
+        this.transform.LookAt(FindLookAtPoint(m_ball.position, this.transform.position), Vector3.up);
 
-        FindPositionAndMove();
-        FindOrientationAndRotate();
+        CameraChangedAimDirectionEvent?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
+    }
+
+    private void InitAimHelpers()
+    {
+        if (m_aimHelpers != null)
+            DeleteAimHelpers();
+
+        switch (m_gameDifficulty)
+        {
+            case PlayerPreferences.GameDifficulty.Easy:
+                m_numberOfAimHelperRays = 4;
+                break;
+            case PlayerPreferences.GameDifficulty.Medium:
+                m_numberOfAimHelperRays = 2;
+                break;
+            case PlayerPreferences.GameDifficulty.Hard:
+                m_numberOfAimHelperRays = 0;
+                break;
+            default:
+                break;
+        }
+
+        m_aimHelpers = new List<GameObject>(m_numberOfAimHelperRays);
+        for (int i = 0; i < m_numberOfAimHelperRays; i++)
+        {
+            m_aimHelpers.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
+            m_aimHelpers[i].SetActive(false);
+
+            BoxCollider collider = m_aimHelpers[i].GetComponent<BoxCollider>();
+            if (collider)
+                Destroy(collider);
+
+            Material material = new Material(Shader.Find("Unlit/Color"));
+            material.SetColor("_Color", m_aimHelperColor);
+            m_aimHelpers[i].GetComponent<MeshRenderer>().material = material;
+        }
+    }
+
+    private void SetActiveAimHelpers(bool _b)
+    {
+        for (int i = 0; i < m_numberOfAimHelperRays; i++)
+        {
+            m_aimHelpers[i].SetActive(_b);
+        }
+    }
+
+    private void DisableAimHelpers()
+    {
+        for (int i = 0; i < m_numberOfAimHelperRays; i++)
+        {
+            m_aimHelpers[i].SetActive(false);
+        }
+    }
+
+    private void DeleteAimHelpers()
+    {
+        for (int i = 0; i < m_aimHelpers.Count; i++)
+        {
+            if (m_aimHelpers[i])
+                GameObject.DestroyImmediate(m_aimHelpers[i]);
+        }
+
+        m_aimHelpers = new List<GameObject>();
     }
 }

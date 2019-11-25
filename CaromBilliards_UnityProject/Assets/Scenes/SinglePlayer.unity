@@ -538,7 +538,7 @@ MonoBehaviour:
   m_ballsLayer:
     serializedVersion: 2
     m_Bits: 256
-  m_inputManager: {fileID: 191845587}
+  m_easeMoveDuration: 1
 --- !u!1 &264297471
 GameObject:
   m_ObjectHideFlags: 0
@@ -898,7 +898,7 @@ MonoBehaviour:
   m_ballsMaxSpeed: 5
   m_endOfShotWaitDuration: 2
   m_gameOverScoreToReach: 3
-  m_preReplayDuration: 1
+  m_preReplayDuration: 2
 --- !u!4 &375293573
 Transform:
   m_ObjectHideFlags: 0
@@ -1755,7 +1755,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_saveAndLoadInPlayerPrefs: 0
   m_masterVolumeValue: 0
-  m_difficulty: 2
+  m_difficulty: 0
 --- !u!4 &809748055
 Transform:
   m_ObjectHideFlags: 0
