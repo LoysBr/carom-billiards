@@ -189,6 +189,7 @@ public class GameManager : MonoBehaviour
                 m_endOfShotWaitTimer += Time.deltaTime;
                 if(m_endOfShotWaitTimer >= m_endOfShotWaitDuration)
                 {
+                    m_endOfShotWaitTimer = 0f;
                     SwitchGameState(GameState.Shooting);
                 }
                 break;
