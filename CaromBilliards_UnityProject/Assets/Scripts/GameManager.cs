@@ -81,11 +81,12 @@ public class GameManager : MonoBehaviour
     public event PlayerIsShootingEvent PlayerShotEvent;
     public event PlayerIsShootingEvent InputShotHoldEvent;
 
-    public delegate void        EndOfShot(bool _succeed);
-    public event EndOfShot      EndOfShotEvent;
+    public delegate void        ScoredPoint();
+    public event ScoredPoint    ScoredPointEvent;
 
     public delegate void        SwitchState(GameState _newState);
-    public event SwitchState    SwitchStateEvent;
+    public event SwitchState    LeaveStateEvent;
+    public event SwitchState    EnterStateEvent;
 
     public delegate void        GameOver();
     public event GameOver       GameOverEvent;
@@ -100,10 +101,8 @@ public class GameManager : MonoBehaviour
         Shooting,
         ProcessingShot,
         EndOfShotScoredPoint,
-        EndOfShotNoPoint,
         PreReplay,
         ProcessingReplay,
-        FinalizeReplay,
         GameOverScreen
     }
     #endregion
@@ -169,7 +168,8 @@ public class GameManager : MonoBehaviour
                     if(scored)
                         SwitchGameState(GameState.EndOfShotScoredPoint);
                     else
-                        SwitchGameState(GameState.EndOfShotNoPoint);
+                        SwitchGameState(GameState.Shooting);
+                    //SwitchGameState(GameState.EndOfShotNoPoint);
                 }
                 break;
             case GameState.EndOfShotScoredPoint:
@@ -193,11 +193,8 @@ public class GameManager : MonoBehaviour
             case GameState.ProcessingReplay: 
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    SwitchGameState(GameState.FinalizeReplay);
+                    SwitchGameState(GameState.Shooting);
                 }
-                break;
-            case GameState.FinalizeReplay:
-                SwitchGameState(GameState.Shooting);                
                 break;
             default:
                 break;
@@ -206,23 +203,26 @@ public class GameManager : MonoBehaviour
 
     private void SwitchGameState(GameState _state)
     {
+        LeaveGameState(m_currentGameSate);
         m_currentGameSate = _state;
-        SwitchStateEvent?.Invoke(m_currentGameSate);
+        EnterGameState(m_currentGameSate);      
+    }
 
-        switch (m_currentGameSate)
+    private void EnterGameState(GameState _state)
+    {
+        switch (_state)
         {
             case GameState.Shooting:
                 ResetBallsCollisionsData();
-                m_inputManager.InputShotEvent += OnPlayerShot;
+                m_inputManager.InputShotEvent += OnPlayerShotInput;
                 m_inputManager.InputMoveCameraEvent += OnMoveCameraInput;
+
                 m_cameraManager.SmoothlyMoveToNewPositionWithAngle(0f);
                 break;
             case GameState.ProcessingShot:
-                m_inputManager.InputShotEvent -= OnPlayerShot;
-                m_inputManager.InputMoveCameraEvent -= OnMoveCameraInput;
                 break;
-            case GameState.EndOfShotScoredPoint: 
-                EndOfShotEvent?.Invoke(true);
+            case GameState.EndOfShotScoredPoint:
+                ScoredPointEvent?.Invoke();
 
                 //checking if Game is over
                 if (ScoreManager.Instance)
@@ -236,13 +236,8 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.LogError("Without a ScoreManager there will be no GameOver.");
                 }
-                break;
-            case GameState.EndOfShotNoPoint:
-                EndOfShotEvent?.Invoke(false);
-                SwitchGameState(GameState.Shooting);
-                break;
+                break;            
             case GameState.PreReplay:
-                m_inputManager.InputMoveCameraEvent -= OnMoveCameraInput;
                 break;
             case GameState.ProcessingReplay:
                 m_whiteBall.OnPlayerShot(m_lastShotData.shotPower, m_lastShotData.shotDirection);
@@ -252,8 +247,35 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 break;
-        }        
+        }
+
+        EnterStateEvent?.Invoke(_state);
     }
+
+    private void LeaveGameState(GameState _state)
+    {
+        switch (_state)
+        {
+            case GameState.Shooting:
+                m_inputManager.InputShotEvent -= OnPlayerShotInput;
+                m_inputManager.InputMoveCameraEvent -= OnMoveCameraInput;
+                break;
+            case GameState.ProcessingShot:
+                break;
+            case GameState.EndOfShotScoredPoint:
+                break;            
+            case GameState.PreReplay:
+                break;
+            case GameState.ProcessingReplay:
+                break;            
+            case GameState.GameOverScreen:
+                break;
+            default:
+                break;
+        }
+
+        LeaveStateEvent?.Invoke(_state);
+    }       
 
     private void ResetBallsCollisionsData()
     {
@@ -272,7 +294,7 @@ public class GameManager : MonoBehaviour
         SwitchGameState(GameState.Shooting);
     }
 
-    private void OnPlayerShot(float _power)
+    private void OnPlayerShotInput(float _power)
     {
         PlayerShotEvent?.Invoke(_power);
 
@@ -347,5 +369,5 @@ public class GameManager : MonoBehaviour
     public void Quit()
     {
         Application.Quit();
-    }
+    }    
 }

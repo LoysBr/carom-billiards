@@ -70,8 +70,9 @@ public class ScoreManager : MonoBehaviour
     {
         if (GameManager.Instance)
         {
-            GameManager.Instance.EndOfShotEvent += OnEndOfShot;
+            GameManager.Instance.ScoredPointEvent += OnPointScored;
             GameManager.Instance.GameOverEvent += SerializeScore;
+            GameManager.Instance.PlayerShotEvent += OnPlayerShot;
         }
 
         ResetScores();
@@ -91,15 +92,15 @@ public class ScoreManager : MonoBehaviour
         m_shotNumber = 0;
     }
     
-    private void OnEndOfShot(bool _succeed)
+    private void OnPointScored()
     {
-        if (_succeed)
-        {
-            m_currentGameScore++;
-        }
-
-        m_shotNumber++;
+        m_currentGameScore++;     
     }
+
+    private void OnPlayerShot(float _power)
+    {
+        m_shotNumber++;
+    }    
 
     private void SerializeScore()
     {

@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     public GameObject   m_scoredPointPanel;
 
     public GameObject   m_gameOverPanel;
+    public GameObject   m_gameOverScorePanel;
     //I duplicated the score objects for game over panel in case we maybe don't 
     //want the same aspect than for the ingame panel
     public Text         m_gameOverScoreText;
@@ -33,8 +34,8 @@ public class UIManager : MonoBehaviour
               
         if (GameManager.Instance)
         {
-            GameManager.Instance.SwitchStateEvent += OnSwitchGameStateEvent;
-            GameManager.Instance.GameOverEvent += OnGameOver;
+            GameManager.Instance.EnterStateEvent += OnEnterGameStateEvent;
+            GameManager.Instance.LeaveStateEvent += OnLeaveGameStateEvent;
             GameManager.Instance.PlayerShotEvent += OnShot;
             GameManager.Instance.InputShotHoldEvent += OnShotPowerChanged;
         }        
@@ -72,28 +73,6 @@ public class UIManager : MonoBehaviour
             {
                 m_scorePanel.SetActive(false);
             }
-        }
-    }
-
-    private void OnGameOver()
-    {
-        if (m_gameOverPanel)
-        { 
-            if (ScoreManager.Instance)
-            {
-                m_gameOverPanel.SetActive(true);
-
-                if (m_gameOverScoreText)
-                    m_gameOverScoreText.text = Utils.GetScoreString(ScoreManager.Instance.CurrentGameScore);
-
-                if (m_gameOverElapsedTimeText)
-                    m_gameOverElapsedTimeText.text = Utils.GetElapsedTimeString(ScoreManager.Instance.ElapsedTime);
-
-                if (m_gameOverShotNumberText)
-                    m_gameOverShotNumberText.text = Utils.GetShotsNumberString(ScoreManager.Instance.ShotNumber);
-            }
-            else
-                m_gameOverPanel.SetActive(false);
         }
     }
 
@@ -140,39 +119,77 @@ public class UIManager : MonoBehaviour
         InitGameUI();
     }
 
-    private void OnSwitchGameStateEvent(GameManager.GameState _state)
+    private void OnEnterGameStateEvent(GameManager.GameState _state)
     {
         switch (_state)
         {
-            case GameManager.GameState.Shooting:
-                if (m_scoredPointPanel)
-                    m_scoredPointPanel.SetActive(false);
+            case GameManager.GameState.Shooting:                
                 break;
             case GameManager.GameState.ProcessingShot:
                 if(m_replayButton)
                     m_replayButton.SetActive(false);
                 break;
-            case GameManager.GameState.EndOfShotScoredPoint:
-                if(m_replayButton)
-                    m_replayButton.SetActive(true);
+            case GameManager.GameState.EndOfShotScoredPoint:               
                 if (m_scoredPointPanel)
                     m_scoredPointPanel.SetActive(true);
-                break;
-            case GameManager.GameState.EndOfShotNoPoint:
-                if (m_replayButton)
-                    m_replayButton.SetActive(true);
-                break;
+                break;            
             case GameManager.GameState.PreReplay:
                 if (m_replayButton)
-                    m_replayButton.SetActive(false);
-                if (m_scoredPointPanel)
-                    m_scoredPointPanel.SetActive(false);
+                    m_replayButton.SetActive(false);               
                 break;
             case GameManager.GameState.ProcessingReplay:
+                break;            
+            case GameManager.GameState.GameOverScreen:
+                if (m_gameOverPanel)
+                {
+                    m_gameOverPanel.SetActive(true);
+                    if (ScoreManager.Instance)
+                    {     
+                        if (m_gameOverScoreText)
+                            m_gameOverScoreText.text = Utils.GetScoreString(ScoreManager.Instance.CurrentGameScore);
+
+                        if (m_gameOverElapsedTimeText)
+                            m_gameOverElapsedTimeText.text = Utils.GetElapsedTimeString(ScoreManager.Instance.ElapsedTime);
+
+                        if (m_gameOverShotNumberText)
+                            m_gameOverShotNumberText.text = Utils.GetShotsNumberString(ScoreManager.Instance.ShotNumber);
+                    }
+                    else
+                    {
+                        m_gameOverScorePanel.SetActive(false);
+                    }                       
+                }
                 break;
-            case GameManager.GameState.FinalizeReplay:
+            default:
+                break;
+        }
+    }
+
+    private void OnLeaveGameStateEvent(GameManager.GameState _state)
+    {
+        switch (_state)
+        {
+            case GameManager.GameState.Shooting:
+                break;
+            case GameManager.GameState.ProcessingShot:                
                 if (m_replayButton)
                     m_replayButton.SetActive(true);
+                break;
+            case GameManager.GameState.EndOfShotScoredPoint:                
+                if (m_scoredPointPanel)
+                    m_scoredPointPanel.SetActive(false);
+                break;            
+            case GameManager.GameState.PreReplay:
+                break;
+            case GameManager.GameState.ProcessingReplay:
+                if (m_replayButton)
+                    m_replayButton.SetActive(true);
+                break;            
+            case GameManager.GameState.GameOverScreen:
+                if (m_gameOverPanel)
+                {                    
+                    m_gameOverPanel.SetActive(false);
+                }
                 break;
             default:
                 break;

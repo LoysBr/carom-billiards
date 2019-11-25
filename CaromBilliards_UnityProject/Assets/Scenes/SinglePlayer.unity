@@ -2109,6 +2109,7 @@ MonoBehaviour:
   m_shotNumberText: {fileID: 793587657}
   m_scoredPointPanel: {fileID: 1597983216}
   m_gameOverPanel: {fileID: 677329494}
+  m_gameOverScorePanel: {fileID: 7305915705350552580}
   m_gameOverScoreText: {fileID: 7305915704819137663}
   m_gameOverElapsedTimeText: {fileID: 7305915706262038186}
   m_gameOverShotNumberText: {fileID: 7305915706580527256}

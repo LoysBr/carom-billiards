@@ -107,7 +107,6 @@ public class StandardInputManager : InputManager
             m_lastFrameMouseLeftClicked = false;
         }
 
-        Debug.Log(Input.mouseScrollDelta.y);
         if(Input.mouseScrollDelta.y != 0)
         {
             float delta = Input.mouseScrollDelta.y * m_mouseWheelFactor;

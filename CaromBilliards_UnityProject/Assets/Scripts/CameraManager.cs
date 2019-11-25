@@ -292,13 +292,13 @@ public class CameraManager : MonoBehaviour
         switch (m_gameDifficulty)
         {
             case PlayerPreferences.GameDifficulty.Easy:
-                m_numberOfAimHelperRays = 4;
+                m_numberOfAimHelperRays = 6;
                 break;
             case PlayerPreferences.GameDifficulty.Medium:
-                m_numberOfAimHelperRays = 2;
+                m_numberOfAimHelperRays = 3;
                 break;
             case PlayerPreferences.GameDifficulty.Hard:
-                m_numberOfAimHelperRays = 0;
+                m_numberOfAimHelperRays = 1;
                 break;
             default:
                 break;
