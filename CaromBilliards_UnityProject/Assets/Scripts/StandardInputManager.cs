@@ -12,7 +12,10 @@ public class StandardInputManager : InputManager
     #region Tweak
     [Range(1, 6)]
     [SerializeField]
-    private float m_mouseXSpeedFactor;    
+    private float m_mouseXSpeedFactor;
+    //[Range(1, 6)]
+    [SerializeField]
+    private float m_mouseWheelFactor;
     #endregion
 
 
@@ -102,6 +105,13 @@ public class StandardInputManager : InputManager
         else
         {
             m_lastFrameMouseLeftClicked = false;
+        }
+
+        Debug.Log(Input.mouseScrollDelta.y);
+        if(Input.mouseScrollDelta.y != 0)
+        {
+            float delta = Input.mouseScrollDelta.y * m_mouseWheelFactor;
+            InvokeInputChangeCameraHeightEvent(-delta);
         }
     }       
 }

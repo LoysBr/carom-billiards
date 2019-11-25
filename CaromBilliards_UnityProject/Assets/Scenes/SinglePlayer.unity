@@ -418,6 +418,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_shotMaxHoldDuration: 0
   m_mouseXSpeedFactor: 2.14
+  m_mouseWheelFactor: 0.04
 --- !u!4 &191845588
 Transform:
   m_ObjectHideFlags: 0
@@ -529,9 +530,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_focusPoint: {fileID: 1961240310}
-  m_horizontalDistanceToBall: 1.5
-  m_cameraHeight: 1.5
-  m_cameraPitchAngle: 40
+  m_maxHorizontalDistanceToBall: 2
+  m_minHorizontalDistanceToBall: 0.75
+  m_minPitchAngle: 10
+  m_maxPitchAngle: 89
+  m_minHeight: 0.3
+  m_maxHeight: 3
+  m_currentPitchHeightValue: 0.443
   m_ball: {fileID: 2100364521}
   m_aimHelperthickness: 0.015
   m_aimHelperColor: {r: 0.3501618, g: 0.7924528, b: 0.31025273, a: 1}

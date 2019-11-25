@@ -10,16 +10,30 @@ public class CameraManager : MonoBehaviour
 
     //the distance between Camera and focused ball
     //if we stay in table's plan
-    [Range(0, 5)]
-    public float m_horizontalDistanceToBall;
+    private float m_horizontalDistanceToBall;
 
     //Vertical Height of Camera from focused ball
-    [Range(0, 10)]
-    public float m_cameraHeight;
+    private float m_cameraHeight;
 
     //Pitch Angle of the camera in Degrees
+    private float m_cameraPitchAngle;
+
+    [Range(0, 5)]
+    public float m_maxHorizontalDistanceToBall;
+    [Range(0, 5)]
+    public float m_minHorizontalDistanceToBall;
     [Range(0, 90)]
-    public float m_cameraPitchAngle;
+    public float m_minPitchAngle;
+    [Range(0, 90)]
+    public float m_maxPitchAngle;
+    [Range(0, 8)]
+    public float m_minHeight;
+    [Range(0, 8)]
+    public float m_maxHeight;
+
+    [SerializeField]
+    [Range(0, 1)]
+    private float m_currentPitchHeightValue; //0 to 1
 
     //Base direction is alignment between White Ball and 'm_referencePointForOrientation' 
     //(I put the table's center). This angle simply move camera around the white ball
@@ -70,6 +84,8 @@ public class CameraManager : MonoBehaviour
         m_angleOffsetFromBaseDir = 0f;
         m_isInEaseMove = false;
         m_easeMoveTimer = 0f;
+
+        OnPitchHeightValueChanged(m_currentPitchHeightValue);
     }
 
     public void SmoothlyMoveToNewPositionWithAngle(float _angle)
@@ -77,7 +93,7 @@ public class CameraManager : MonoBehaviour
         m_isInEaseMove = true;
 
         m_previousPosition = transform.position;
-        //m_previousLookAtPoint = m_lookAtPoint;
+
         m_newPosition = FindCameraPosition(m_ball.position, m_focusPoint.position, _angle);
         m_newLookAtPoint = FindLookAtPoint(m_ball.position, m_newPosition);
     }
@@ -89,8 +105,7 @@ public class CameraManager : MonoBehaviour
 
         m_angleOffsetFromBaseDir += _angle;
 
-        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
-        FindOrientationAndRotate();
+        RefreshPosition();
     }
 
     public void SetCameraPositionWithAngle(float _angle)
@@ -99,6 +114,18 @@ public class CameraManager : MonoBehaviour
 
         this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
         FindOrientationAndRotate();
+    }
+
+    public void OnInputChangeCameraHeight(float _deltaValue)
+    {
+        m_currentPitchHeightValue += _deltaValue;
+
+        if (m_currentPitchHeightValue > 1)
+            m_currentPitchHeightValue = 1;
+        else if (m_currentPitchHeightValue < 0)
+            m_currentPitchHeightValue = 0;
+
+        OnPitchHeightValueChanged(m_currentPitchHeightValue);
     }
 
     //We update Aim Helpers objects depending of camera direction
@@ -241,6 +268,20 @@ public class CameraManager : MonoBehaviour
         this.transform.LookAt(FindLookAtPoint(m_ball.position, this.transform.position), Vector3.up);
 
         CameraChangedAimDirectionEvent?.Invoke(new Vector3(transform.forward.x, 0, transform.forward.z));
+    }
+
+    private void OnPitchHeightValueChanged(float _value)
+    {
+        m_cameraPitchAngle = m_minPitchAngle + (m_maxPitchAngle - m_minPitchAngle) * _value;
+        m_cameraHeight = m_minHeight + (m_maxHeight - m_minHeight) * _value;
+        m_horizontalDistanceToBall = m_minHorizontalDistanceToBall + (m_maxHorizontalDistanceToBall - m_minHorizontalDistanceToBall) * _value;
+        RefreshPosition();
+    }    
+
+    private void RefreshPosition()
+    {
+        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
+        FindOrientationAndRotate();
     }
 
     private void InitAimHelpers()

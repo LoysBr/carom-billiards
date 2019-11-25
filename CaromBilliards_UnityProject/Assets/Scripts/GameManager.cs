@@ -130,6 +130,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {        
         m_inputManager.InputShotHoldEvent += OnInputShotHold;
+        m_inputManager.InputChangeCameraHeightEvent += OnInputChangeCameraHeight;
         m_inputManager.m_shotMaxHoldDuration = m_shotMaxHoldDuration;
 
         m_cameraManager.CameraChangedAimDirectionEvent += OnAimDirectionChanged;
@@ -285,6 +286,12 @@ public class GameManager : MonoBehaviour
     private void OnInputShotHold(float _power)
     {
         InputShotHoldEvent?.Invoke(_power);
+    }
+
+    private void OnInputChangeCameraHeight(float _delta)
+    {
+        //Debug.Log("delta : " + _delta.ToString());
+        m_cameraManager.OnInputChangeCameraHeight(_delta);
     }
 
     private void SaveLastShotData(float _shotPower)
