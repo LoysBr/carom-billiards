@@ -773,10 +773,15 @@ PrefabInstance:
       propertyPath: m_AngularDrag
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8450007479558594625, guid: e8ac89e683e6bf2459378dc2eac8e31a,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.148
+      value: -0.672
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
@@ -786,7 +791,7 @@ PrefabInstance:
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 98.787
+      value: 98.676
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
@@ -899,7 +904,7 @@ MonoBehaviour:
   m_whiteBall: {fileID: 2100364522}
   m_redBall: {fileID: 361072065}
   m_yellowBall: {fileID: 627151629}
-  m_shotMaxHoldDuration: 1
+  m_shotMaxHoldDuration: 3.22
   m_ballsMaxSpeed: 5
   m_endOfShotWaitDuration: 2
   m_gameOverScoreToReach: 3
@@ -1450,10 +1455,15 @@ PrefabInstance:
       propertyPath: m_AngularDrag
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8450007479558594625, guid: e8ac89e683e6bf2459378dc2eac8e31a,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.05
+      value: -0.633
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
@@ -1463,7 +1473,7 @@ PrefabInstance:
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 98.787
+      value: 98.618
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
@@ -4842,10 +4852,15 @@ PrefabInstance:
       propertyPath: m_AngularDrag
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8450007479558594625, guid: e8ac89e683e6bf2459378dc2eac8e31a,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.097
+      value: -0.569
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
@@ -4855,7 +4870,7 @@ PrefabInstance:
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 98.658
+      value: 98.704
       objectReference: {fileID: 0}
     - target: {fileID: 8450007479558594627, guid: e8ac89e683e6bf2459378dc2eac8e31a,
         type: 3}

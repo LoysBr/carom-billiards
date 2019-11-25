@@ -163,13 +163,26 @@ public class GameManager : MonoBehaviour
             case GameState.ProcessingShot:
                 if (m_whiteBall.IsStopped() && m_yellowBall.IsStopped() && m_redBall.IsStopped())
                 {
-                    bool scored = m_whiteBall.HasCollidedWithTwoOtherBalls();
+                    //classic case
+                    bool scored = m_whiteBall.HasCollidedWithTwoOtherBallsLastShot();
+                    //special case when balls where already in collision
+                    if(!scored)
+                    {
+                        //white ball was touching the two others + at least one of the other ball moved 
+                        bool touch = m_whiteBall.IsTouchingTwoOtherBalls();
+                        if(touch)
+                        {
+                            if (m_yellowBall.HasMovedSinceLastCheck() || m_redBall.HasMovedSinceLastCheck())
+                            {
+                                scored = true;
+                            }
+                        }
+                    }
 
                     if(scored)
                         SwitchGameState(GameState.EndOfShotScoredPoint);
                     else
                         SwitchGameState(GameState.Shooting);
-                    //SwitchGameState(GameState.EndOfShotNoPoint);
                 }
                 break;
             case GameState.EndOfShotScoredPoint:
@@ -213,7 +226,7 @@ public class GameManager : MonoBehaviour
         switch (_state)
         {
             case GameState.Shooting:
-                ResetBallsCollisionsData();
+                ResetBallsShotData();
                 m_inputManager.InputShotEvent += OnPlayerShotInput;
                 m_inputManager.InputMoveCameraEvent += OnMoveCameraInput;
 
@@ -277,11 +290,19 @@ public class GameManager : MonoBehaviour
         LeaveStateEvent?.Invoke(_state);
     }       
 
-    private void ResetBallsCollisionsData()
+    private void ResetBallsShotData()
     {
         m_whiteBall.ResetLastShotCollisions();
         m_yellowBall.ResetLastShotCollisions();
         m_redBall.ResetLastShotCollisions();
+
+        m_whiteBall.ResetTouchingObjects();
+        m_yellowBall.ResetTouchingObjects();
+        m_redBall.ResetTouchingObjects();
+
+        m_whiteBall.ResetMovedSinceLastCheck();
+        m_yellowBall.ResetMovedSinceLastCheck();
+        m_redBall.ResetMovedSinceLastCheck();
     }
 
     public void RestartGame()
@@ -312,13 +333,11 @@ public class GameManager : MonoBehaviour
 
     private void OnInputChangeCameraHeight(float _delta)
     {
-        //Debug.Log("delta : " + _delta.ToString());
         m_cameraManager.OnInputChangeCameraHeight(_delta);
     }
 
     private void SaveLastShotData(float _shotPower)
     {
-        //Debug.Log("Save Last Shot Data");
         m_lastShotData = new ReplayShotData();
         m_lastShotData.whiteBallPos = m_whiteBall.gameObject.transform.position;
         m_lastShotData.yellowBallPos = m_yellowBall.gameObject.transform.position;
@@ -330,7 +349,6 @@ public class GameManager : MonoBehaviour
 
     private void PlaceElementsLikeBeforeShot()
     {
-        //Debug.Log("PlaceElementsLikeBeforeShot");
         m_whiteBall.gameObject.transform.position = m_lastShotData.whiteBallPos;
         m_yellowBall.gameObject.transform.position = m_lastShotData.yellowBallPos;
         m_redBall.gameObject.transform.position = m_lastShotData.redBallPos;

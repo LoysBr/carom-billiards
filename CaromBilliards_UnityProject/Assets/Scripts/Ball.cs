@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+    private const float MOVING_THRESHOLD = 0.01f; //we consider a movement when velocity.magnitude is over this
+
     private float       m_maxSpeed; //in m/s
     public float MaxSpeed { get { return m_maxSpeed; }
         set { m_maxSpeed = value; } }
 
     private Rigidbody   m_rigidBody;
-    private bool        m_isMoving;
     
     #region Sound
     public AudioClip    m_cushionCollisionSound;
@@ -29,13 +30,23 @@ public class Ball : MonoBehaviour
 
     //to store every collisions from last shot
     //for basic rules it's a bit too much but may be 
-    //usefull if we add new rules
+    //usefull if we add new rules with Cushions etc
     private List<BilliardObjects> m_lastShotCollisions;
+
+    //used to know if balls are stuck before a shot
+    private HashSet<BilliardObjects> m_touchingObjectsWhileStopped;
+
+    //in the situation balls are already in collision before
+    //a shot, we need to detect if they move to trigger point
+    private bool    m_hasMovedSinceLastCheck;
+
 
     private void Start()
     {
         m_rigidBody = GetComponent<Rigidbody>();
         ResetLastShotCollisions();
+        ResetTouchingObjects();
+        m_hasMovedSinceLastCheck = false;
 
         switch (gameObject.tag)
         {
@@ -58,6 +69,11 @@ public class Ball : MonoBehaviour
         m_lastShotCollisions = new List<BilliardObjects>(20);
     }
 
+    public void ResetTouchingObjects()
+    {
+        m_touchingObjectsWhileStopped = new HashSet<BilliardObjects>();
+    }
+
     //collision with other balls
     private void OnCollisionEnter(Collision collision)
     {
@@ -75,10 +91,26 @@ public class Ball : MonoBehaviour
             default:
                 break;
         }
-
-        m_isMoving = true;
-
+        
         PlayBallCollisionSound(m_rigidBody.velocity.magnitude / m_maxSpeed);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        switch (collision.collider.gameObject.tag)
+        {
+            case "WhiteBall":
+                m_touchingObjectsWhileStopped.Add(BilliardObjects.WhiteBall);
+                break;
+            case "YellowBall":
+                m_touchingObjectsWhileStopped.Add(BilliardObjects.YellowBall);
+                break;
+            case "RedBall":
+                m_touchingObjectsWhileStopped.Add(BilliardObjects.RedBall);
+                break;
+            default:
+                break;
+        }
     }
 
     //collision with cushions
@@ -94,26 +126,31 @@ public class Ball : MonoBehaviour
 
     private void Update()
     {
-        if(m_isMoving)
+        if (m_rigidBody.velocity.magnitude <= MOVING_THRESHOLD)
         {
-            HelpBallStop();
+            //we help ball stopping else it's too long for our game
+            m_rigidBody.velocity = Vector3.zero;
+        }
+        else
+        {
+            m_hasMovedSinceLastCheck = true;
         }
     }
 
     public void OnPlayerShot(float _power, Vector3 _dir)
     {       
         m_rigidBody.velocity = m_maxSpeed * _power * _dir;
-        m_isMoving = true;
+
 
         PlayBallCollisionSound(_power);
     }
 
     public bool IsStopped()
     {
-        return !m_isMoving;
+        return m_rigidBody.velocity.magnitude == 0f;
     }
 
-    public bool HasCollidedWithTwoOtherBalls()
+    public bool HasCollidedWithTwoOtherBallsLastShot()
     {
         HashSet<BilliardObjects> collisions = new HashSet<BilliardObjects>();
         foreach(BilliardObjects obj in m_lastShotCollisions)
@@ -129,6 +166,31 @@ public class Ball : MonoBehaviour
         return false;
     }
 
+    public bool IsTouchingTwoOtherBalls()
+    {
+        int touchingBallsNb = 0;
+        foreach (BilliardObjects obj in m_touchingObjectsWhileStopped)
+        {
+            if (obj != m_selfTag && obj != BilliardObjects.Cushion)
+            {
+                touchingBallsNb++;
+                if (touchingBallsNb == 2)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool HasMovedSinceLastCheck()
+    {
+        return m_hasMovedSinceLastCheck;
+    }
+    public void ResetMovedSinceLastCheck()
+    {
+        m_hasMovedSinceLastCheck = false;
+    }
+
     /// <summary>
     /// While using physic, after a shot, balls take a lot
     /// of time to decrease their velocity down to pure Zero
@@ -136,11 +198,7 @@ public class Ball : MonoBehaviour
     /// </summary>
     private void HelpBallStop()
     {
-        if (m_rigidBody.velocity.magnitude <= 0.01)
-        {
-            m_rigidBody.velocity = Vector3.zero;
-            m_isMoving = false;
-        }
+        
     }
 
     private void PlayCushionCollisionSound(float _volume)
