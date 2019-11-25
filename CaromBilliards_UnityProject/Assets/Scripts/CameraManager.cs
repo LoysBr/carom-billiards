@@ -92,6 +92,8 @@ public class CameraManager : MonoBehaviour
     {
         m_isInEaseMove = true;
 
+        m_angleOffsetFromBaseDir = _angle;
+
         m_previousPosition = transform.position;
 
         m_newPosition = FindCameraPosition(m_ball.position, m_focusPoint.position, _angle);
@@ -111,9 +113,7 @@ public class CameraManager : MonoBehaviour
     public void SetCameraPositionWithAngle(float _angle)
     {
         m_angleOffsetFromBaseDir = _angle;
-
-        this.gameObject.transform.position = FindCameraPosition(m_ball.position, m_focusPoint.position, m_angleOffsetFromBaseDir);
-        FindOrientationAndRotate();
+        RefreshPosition();
     }
 
     public void OnInputChangeCameraHeight(float _deltaValue)
@@ -143,6 +143,8 @@ public class CameraManager : MonoBehaviour
             {
                 m_isInEaseMove = false;
                 m_easeMoveTimer = 0f;
+                                
+                RefreshPosition();
             }
             else
             {
