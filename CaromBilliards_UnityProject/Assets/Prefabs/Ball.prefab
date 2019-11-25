@@ -91,7 +91,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8450007479558594639}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 706e96af5ef5d7644a77c5a223f499a8, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -109,7 +109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a964563a51666341ae1c9fcc2eb8df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_maxSpeed: 1
   m_cushionCollisionSound: {fileID: 8300000, guid: b3319e2a65c87ff43b42d0bfe6b7cd1d,
     type: 3}
   m_ballCollisionSound: {fileID: 8300000, guid: 5c05470a9841b1842b0f17370927603e,
